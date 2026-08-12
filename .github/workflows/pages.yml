@@ -29,11 +29,21 @@ jobs:
         with:
           enablement: true
 
-      # Le site est statique : on publie la racine telle quelle.
+      # On ne publie que public/, qui ne contient que la version chiffrée.
+      # Publier la racine exposerait le site en clair à côté du portail.
+      - name: Vérifier que le site en clair n'est pas publié
+        run: |
+          test -f public/index.html
+          if grep -q "MERCATODDS_RUMEURS" public/index.html; then
+            echo "::error::Le contenu en clair a fuité dans public/index.html"
+            exit 1
+          fi
+          echo "public/ ne contient que du chiffré."
+
       - name: Empaqueter le site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ./public
 
       - name: Déployer
         id: deployment
