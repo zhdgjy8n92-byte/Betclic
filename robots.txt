@@ -1,0 +1,3 @@
+# Maquette de démonstration : accessible par lien, mais jamais indexée.
+User-agent: *
+Disallow: /

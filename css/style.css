@@ -157,10 +157,12 @@ h1, h2, h3 { margin: 0; }
 /* Logo de l'opération, généré en SVG depuis les polices Betclic
    (voir tools/make-logo.py). Deux déclinaisons : compacte pour le
    header, empilée pour la une. */
+/* Le lock-up horizontal est très allongé (≈ 10:1) : on le contraint en
+   largeur, sinon il chasse le portefeuille hors de l'écran. */
 .brand__logo {
   display: block;
-  height: 34px;
-  width: auto;
+  width: min(50vw, 232px);
+  height: auto;
 }
 
 .hero__logo-img {
@@ -238,7 +240,7 @@ h1, h2, h3 { margin: 0; }
 }
 
 @media (max-width: 380px) {
-  .brand__logo { height: 28px; }
+  .brand__logo { width: min(46vw, 180px); }
 }
 
 /* =========================================================
