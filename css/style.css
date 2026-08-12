@@ -1412,6 +1412,165 @@ h1, h2, h3 { margin: 0; }
   font-size: 11px;
 }
 
+/* =========================================================
+   SURVOL
+   Réservé aux appareils à pointeur fin : sur un écran tactile,
+   l'état de survol resterait figé après le tap.
+   ========================================================= */
+@media (hover: hover) and (pointer: fine) {
+
+  /* --- Carte rumeur : elle se soulève --- */
+  .rumeur:not(.is-locked) {
+    transition:
+      transform .28s cubic-bezier(.2, .8, .3, 1),
+      border-color .28s ease,
+      box-shadow .28s ease;
+  }
+
+  .rumeur:not(.is-locked):hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, .16);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, .45);
+  }
+
+  /* La lueur reprend la couleur de l'état de la carte */
+  .rumeur.is-hot:not(.is-locked):hover {
+    border-color: rgba(227, 6, 19, .6);
+    box-shadow: 0 16px 36px rgba(227, 6, 19, .22);
+  }
+
+  .rumeur.is-chosen:hover {
+    border-color: var(--teal);
+    box-shadow: 0 16px 36px rgba(20, 214, 166, .2);
+  }
+
+  /* Le portrait et les écussons respirent avec la carte */
+  .rumeur__photo { transition: transform .45s cubic-bezier(.2, .8, .3, 1); }
+  .rumeur:not(.is-locked):hover .rumeur__photo { transform: scale(1.09); }
+
+  .rumeur__crest { transition: transform .28s cubic-bezier(.2, .8, .3, 1); }
+  .rumeur:not(.is-locked):hover .rumeur__crest { transform: scale(1.14); }
+
+  .rumeur__avatar { transition: border-color .28s ease; }
+  .rumeur:not(.is-locked):hover .rumeur__avatar {
+    border-color: rgba(255, 255, 255, .55);
+  }
+
+  /* --- Bouton jaune : un éclat le balaie ---
+     Sur du jaune, une bande blanche ne se voit pas : il faut une lueur
+     franche, resserrée, précédée d'un creux plus sombre pour la détacher. */
+  .cta__go::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -60%;
+    width: 34%;
+    height: 220%;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(160, 120, 0, .22) 28%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(160, 120, 0, .18) 72%,
+      transparent 100%);
+    filter: blur(1.5px);
+    transform: rotate(18deg);
+    transition: left .6s cubic-bezier(.3, .7, .4, 1);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .rumeur:hover .cta__go::before,
+  .cta__go:hover::before { left: 135%; }
+
+  .cta__go:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .8),
+      inset 0 -2px 3px rgba(150, 110, 0, .28),
+      0 10px 24px rgba(255, 225, 74, .3);
+  }
+
+  /* --- Sélections de la fiche --- */
+  .option:hover {
+    transform: translateX(4px);
+    background: rgba(255, 255, 255, .1);
+    border-color: rgba(255, 255, 255, .24);
+  }
+
+  .option.is-selected:hover {
+    background: rgba(227, 6, 19, .26);
+    border-color: var(--red-soft);
+  }
+
+  .option__bonus { transition: transform .22s cubic-bezier(.2, .8, .3, 1); }
+  .option:hover .option__bonus { transform: scale(1.08) rotate(-2deg); }
+
+  .option__radio { transition: border-color .2s ease; }
+  .option:hover .option__radio { border-color: rgba(255, 255, 255, .7); }
+
+  /* --- Boutons rouges : reflet et élévation --- */
+  .sheet__submit::before,
+  .modal__primary::before {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -75%;
+    width: 40%;
+    height: 220%;
+    background: linear-gradient(90deg,
+      transparent, rgba(255, 255, 255, .45), transparent);
+    transform: rotate(18deg);
+    transition: left .65s cubic-bezier(.3, .7, .4, 1);
+    pointer-events: none;
+  }
+
+  .sheet__submit:hover::before,
+  .modal__primary:hover::before { left: 135%; }
+
+  .sheet__submit:hover,
+  .modal__primary:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, .45),
+      inset 0 -2px 4px rgba(0, 0, 0, .3),
+      0 12px 28px rgba(227, 6, 19, .45);
+  }
+
+  .modal__secondary:hover {
+    background: rgba(255, 255, 255, .12);
+    border-color: rgba(255, 255, 255, .24);
+  }
+
+  .modal__plus,
+  .cta__plus { transition: transform .25s cubic-bezier(.2, .8, .3, 1); }
+  .modal__secondary:hover .modal__plus { transform: rotate(90deg) scale(1.1); }
+
+  .modal__cancel { transition: color .2s ease; }
+  .modal__cancel:hover { color: var(--text-dim); }
+
+  /* --- Ticket --- */
+  .ticket__edit,
+  .ticket__cancel { transition: background .2s ease, border-color .2s ease, color .2s ease; }
+
+  .ticket__edit:hover {
+    background: rgba(255, 255, 255, .1);
+    border-color: rgba(255, 255, 255, .24);
+  }
+
+  .ticket__cancel:hover { color: var(--red-soft); border-color: rgba(227, 6, 19, .5); }
+
+  /* --- Losanges de série : ils pivotent --- */
+  .streak__item { transition: transform .3s cubic-bezier(.2, .8, .3, 1); }
+  .streak__item:hover { transform: rotate(135deg) scale(1.3); }
+
+  /* --- Fermeture de la fiche --- */
+  .sheet__close { transition: transform .25s ease, background .2s ease; }
+  .sheet__close:hover {
+    transform: rotate(90deg);
+    background: rgba(227, 6, 19, .85);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
