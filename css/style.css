@@ -64,13 +64,16 @@ body {
   font-family: 'Betclic', 'Helvetica Neue', Arial, sans-serif;
   font-size: 16px;
   line-height: 1.4;
-  padding-bottom: 120px;
   overflow-x: hidden;
 }
+
+body.sheet-open { overflow: hidden; }
 
 button { font-family: inherit; cursor: pointer; }
 
 h1, h2, h3 { margin: 0; }
+
+.dot { color: var(--text-mute); }
 
 /* =========================================================
    HEADER
@@ -93,65 +96,114 @@ h1, h2, h3 { margin: 0; }
   gap: 12px;
 }
 
-/* --- Logo Betclic reconstitué : bloc rouge + wordmark blanc italique --- */
 .brand {
   display: flex;
   align-items: center;
-  gap: 9px;
   text-decoration: none;
   color: inherit;
   min-width: 0;
 }
 
-.brand__logo {
-  background: var(--red);
-  border-radius: 4px;
-  padding: 5px 9px 6px;
+/* =========================================================
+   LOGO DE L'OPÉRATION
+   Reconstitution du lock-up fourni : pavé rouge « Betclic »
+   surmontant le mot MERCAT'ODDS, blanc à contour rouge.
+   Les deux variantes partagent la même mécanique, seule la
+   taille (--logo-size) et l'épaisseur du contour changent.
+   ========================================================= */
+.oplogo {
   display: inline-flex;
   align-items: center;
   line-height: 1;
 }
 
-.brand__logo-text {
+.oplogo--stack {
+  flex-direction: column;
+  gap: 3px;
+  --logo-size: clamp(34px, 10.5vw, 60px);
+  --logo-stroke: .1em;
+}
+
+.oplogo--inline {
+  gap: 8px;
+  --logo-size: 20px;
+  --logo-stroke: 2.5px;
+}
+
+.oplogo__betclic {
+  background: var(--red);
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  padding: .28em .42em .32em;
+  font-size: calc(var(--logo-size) * .42);
+}
+
+.oplogo--stack .oplogo__betclic { font-size: calc(var(--logo-size) * .34); }
+
+.oplogo__betclic-text {
+  display: block;
   font-family: 'Betclic', sans-serif;
   font-weight: 700;
-  font-size: 19px;
-  letter-spacing: -.3px;
+  font-size: 1em;
+  letter-spacing: -.02em;
   color: #fff;
   transform: skewX(-11deg);
+}
+
+/* Le mot : calque de contour rouge derrière, texte blanc devant */
+.oplogo__word {
+  position: relative;
+  isolation: isolate;
   display: block;
-}
-
-.brand__product {
-  font-family: 'Betclic Condensed', 'Betclic', sans-serif;
+  font-family: 'Betclic Condensed', sans-serif;
   font-weight: 700;
-  font-size: 19px;
-  letter-spacing: .2px;
+  font-size: var(--logo-size);
+  line-height: 1;
   text-transform: uppercase;
+  letter-spacing: .01em;
+  color: #fff;
+  transform: skewX(-8deg);
   white-space: nowrap;
+  padding: 0 .06em;
 }
 
-.brand__apos { color: var(--red-soft); }
+.oplogo__word::before {
+  content: attr(data-text);
+  position: absolute;
+  left: .06em;
+  top: 0;
+  z-index: -1;
+  color: var(--red);
+  -webkit-text-stroke: var(--logo-stroke) var(--red);
+  text-stroke: var(--logo-stroke) var(--red);
+}
 
-/* --- Portefeuille --- */
+.oplogo--stack .oplogo__word {
+  filter: drop-shadow(0 .04em .04em rgba(0, 0, 0, .45));
+}
+
 .wallet {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 
 .wallet__chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   background: var(--card-2);
   border-radius: 999px;
-  padding: 4px 10px 4px 4px;
+  padding: 4px 11px 4px 4px;
   font-weight: 700;
   font-size: 13px;
   white-space: nowrap;
+  transition: transform .3s ease;
 }
+
+.wallet__chip.is-bumped { transform: scale(1.14); }
 
 .wallet__icon {
   width: 19px; height: 19px;
@@ -165,12 +217,9 @@ h1, h2, h3 { margin: 0; }
   font-style: italic;
 }
 
-.wallet__icon--plus { font-style: normal; font-size: 14px; }
-
-.wallet__medal,
 .wallet__avatar {
   border: 0;
-  background: var(--card-2);
+  background: linear-gradient(160deg, #3A4568, #2A3350);
   width: 34px; height: 34px;
   border-radius: 50%;
   display: grid;
@@ -179,8 +228,6 @@ h1, h2, h3 { margin: 0; }
   position: relative;
   padding: 0;
 }
-
-.wallet__avatar { background: linear-gradient(160deg, #3A4568, #2A3350); }
 
 .wallet__badge {
   position: absolute;
@@ -196,21 +243,8 @@ h1, h2, h3 { margin: 0; }
   padding: 0 3px;
 }
 
-/* On dégraisse le portefeuille au fur et à mesure que l'écran rétrécit,
-   pour que le nom du produit ne soit jamais tronqué. */
-@media (max-width: 560px) {
-  .wallet__medal { display: none; }
-}
-
-@media (max-width: 480px) {
-  .wallet__chip--freebet { display: none; }
-  .brand__product { font-size: 17px; }
-  .brand__logo-text { font-size: 17px; }
-  .topbar__inner { gap: 8px; }
-}
-
-@media (max-width: 360px) {
-  .brand__product { display: none; }
+@media (max-width: 380px) {
+  .oplogo--inline .oplogo__word { display: none; }
 }
 
 /* =========================================================
@@ -241,12 +275,12 @@ h1, h2, h3 { margin: 0; }
   position: relative;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 24px var(--pad) 26px;
+  padding: 22px var(--pad) 24px;
   text-align: center;
 }
 
 .hero__kicker {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   font-size: 13px;
   color: var(--text-dim);
   font-weight: 700;
@@ -256,31 +290,65 @@ h1, h2, h3 { margin: 0; }
   gap: 7px;
 }
 
-.hero__ball { font-size: 15px; }
-.dot { color: var(--text-mute); }
+.hero__logo { margin: 4px 0 12px; }
 
 .hero__title {
+  margin: 0 0 8px;
   font-family: 'Betclic Condensed', sans-serif;
   font-weight: 700;
-  font-size: clamp(40px, 12vw, 62px);
-  line-height: .95;
+  font-size: 22px;
+  line-height: 1;
   text-transform: uppercase;
-  letter-spacing: .5px;
-  transform: skewX(-6deg);
-  margin-bottom: 8px;
+  letter-spacing: 1.4px;
+  color: var(--yellow);
 }
 
 .hero__baseline {
   margin: 0 auto;
-  max-width: 30ch;
-  font-size: 15px;
+  max-width: 34ch;
+  font-size: 14.5px;
   color: var(--text-dim);
 }
 
 .hero__baseline strong { color: var(--yellow); }
 
+/* --- Série de guess (clin d'œil aux losanges de forme de l'app) --- */
+.streak { margin-top: 16px; }
+
+.streak__row {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+}
+
+.streak__item {
+  width: 15px; height: 15px;
+  transform: rotate(45deg);
+  border-radius: 3px;
+  position: relative;
+}
+
+.streak__item--win  { background: var(--teal); }
+.streak__item--lose { background: var(--red); }
+
+.streak__item--today {
+  background: none;
+  border: 2px solid var(--yellow);
+}
+
+.streak__item--today.is-done { background: var(--yellow); }
+
+.streak__label {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.streak__label b { color: var(--teal); }
+
 .hero__countdown {
-  margin-top: 16px;
+  margin-top: 14px;
   display: inline-flex;
   align-items: center;
   gap: 9px;
@@ -307,86 +375,179 @@ h1, h2, h3 { margin: 0; }
 }
 
 /* =========================================================
-   TABS
+   TICKET — le guess validé du jour
    ========================================================= */
-.tabs {
-  position: sticky;
-  top: 55px;
-  z-index: 30;
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
-  padding: 0 var(--pad);
+.ticket {
   max-width: var(--maxw);
-  margin: 0 auto;
+  margin: 16px auto 0;
+  padding: 0 var(--pad);
 }
 
-.tabs::-webkit-scrollbar { display: none; }
+.ticket__card {
+  background: var(--card);
+  border: 1px solid var(--red);
+  border-radius: var(--r-card);
+  overflow: hidden;
+}
 
-.tabs__item {
-  flex: 0 0 auto;
-  border: 0;
-  background: none;
-  color: var(--text-mute);
-  font-weight: 700;
-  font-size: 15px;
-  padding: 15px 10px 13px;
-  border-bottom: 3px solid transparent;
-  white-space: nowrap;
+.ticket__top {
+  background: linear-gradient(100deg, var(--red) 0%, #8A0A18 100%);
+  padding: 9px 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 14px;
+  letter-spacing: .6px;
+  text-transform: uppercase;
 }
 
-.tabs__item.is-active {
-  color: #fff;
-  border-bottom-color: #fff;
+.ticket__body { padding: 14px; }
+
+.ticket__joueur {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 22px;
+  text-transform: uppercase;
+  line-height: 1.1;
 }
 
-.tabs__item--combi { color: #fff; }
-.tabs__combi-icon { color: var(--red-soft); display: flex; }
+.ticket__route {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
 
-.tabs__combi-count {
-  background: var(--red);
-  color: #fff;
+.ticket__lignes {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ticket__ligne {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 14px;
+}
+
+.ticket__check {
+  flex: 0 0 auto;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #06121C;
   font-size: 11px;
-  min-width: 18px;
-  height: 18px;
-  border-radius: 999px;
+  font-weight: 700;
   display: grid;
   place-items: center;
-  padding: 0 4px;
+  margin-top: 2px;
 }
 
+.ticket__ligne-sous {
+  display: block;
+  font-size: 12px;
+  color: var(--text-mute);
+}
+
+.ticket__ligne-bonus {
+  margin-left: auto;
+  color: var(--yellow);
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.ticket__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.ticket__total-label {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  font-weight: 700;
+}
+
+.ticket__total-value {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 30px;
+  font-style: italic;
+  color: var(--yellow);
+  line-height: 1;
+}
+
+.ticket__actions { display: flex; gap: 8px; margin-top: 12px; }
+
+.ticket__edit,
+.ticket__cancel {
+  flex: 1;
+  border: 1px solid var(--line);
+  background: var(--card-2);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: var(--r-btn);
+  padding: 11px;
+}
+
+.ticket__cancel { color: var(--text-mute); }
+
 /* =========================================================
-   FEED / CARTE RUMEUR
+   FEED
    ========================================================= */
+.feed-head {
+  max-width: var(--maxw);
+  margin: 22px auto 0;
+  padding: 0 var(--pad);
+}
+
+.feed-head__title {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 22px;
+  text-transform: uppercase;
+}
+
+.feed-head__sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.feed-head__sub b { color: var(--yellow); }
+
 .feed {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 14px var(--pad) 0;
+  padding: 12px var(--pad) 0;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
-.feed__empty {
-  text-align: center;
-  color: var(--text-mute);
-  padding: 40px 0;
-}
-
+/* =========================================================
+   CARTE RUMEUR
+   ========================================================= */
 .rumeur {
   background: var(--card);
   border-radius: var(--r-card);
   overflow: hidden;
   border: 1px solid transparent;
+  transition: opacity .25s ease;
 }
 
 .rumeur.is-hot { border-color: rgba(227, 6, 19, .35); }
+.rumeur.is-chosen { border-color: var(--teal); }
+
+.rumeur.is-locked { opacity: .42; }
+.rumeur.is-locked .rumeur__banner { filter: grayscale(.7); }
 
 /* --- Bandeau joueur --- */
 .rumeur__banner {
@@ -396,6 +557,11 @@ h1, h2, h3 { margin: 0; }
   align-items: center;
   gap: 12px;
   background: linear-gradient(115deg, var(--from-color, #222) -10%, var(--card-2) 55%, var(--to-color, #333) 130%);
+  text-align: left;
+  width: 100%;
+  border: 0;
+  color: inherit;
+  font: inherit;
 }
 
 .rumeur__banner::after {
@@ -422,7 +588,7 @@ h1, h2, h3 { margin: 0; }
   letter-spacing: .5px;
 }
 
-.rumeur__ident { position: relative; z-index: 1; min-width: 0; flex: 1; }
+.rumeur__ident { position: relative; z-index: 1; min-width: 0; flex: 1; display: block; }
 
 .rumeur__name {
   font-family: 'Betclic Condensed', sans-serif;
@@ -438,6 +604,7 @@ h1, h2, h3 { margin: 0; }
 .rumeur__flag { font-size: 15px; }
 
 .rumeur__meta {
+  display: block;
   font-size: 12.5px;
   color: rgba(255,255,255,.72);
   margin-top: 2px;
@@ -479,7 +646,6 @@ h1, h2, h3 { margin: 0; }
   color: var(--yellow);
 }
 
-/* --- Pastilles d'état --- */
 .rumeur__flags {
   position: absolute;
   top: 12px; right: 14px;
@@ -497,12 +663,19 @@ h1, h2, h3 { margin: 0; }
   padding: 3px 8px;
 }
 
-.pill--hot { background: var(--red); color: #fff; }
+.pill--hot    { background: var(--red); color: #fff; }
+.pill--chosen { background: var(--teal); color: #06121C; }
 
-/* --- Bloc article --- */
+/* --- Article --- */
 .rumeur__article {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
   padding: 13px 16px;
-  border-bottom: 1px solid var(--line);
+  text-align: left;
 }
 
 .rumeur__source {
@@ -520,6 +693,7 @@ h1, h2, h3 { margin: 0; }
 .rumeur__source-name { color: var(--red-soft); }
 
 .rumeur__titre {
+  display: block;
   font-family: 'Betclic Condensed', sans-serif;
   font-weight: 700;
   font-size: 18px;
@@ -533,26 +707,9 @@ h1, h2, h3 { margin: 0; }
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.rumeur.is-open .rumeur__chapo {
-  -webkit-line-clamp: unset;
-  display: block;
-}
-
-.rumeur__more {
-  margin-top: 7px;
-  background: none;
-  border: 0;
-  padding: 0;
-  color: var(--text);
-  font-size: 12.5px;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 /* --- Jauge de fiabilité --- */
@@ -560,8 +717,7 @@ h1, h2, h3 { margin: 0; }
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 11px 16px;
-  border-bottom: 1px solid var(--line);
+  padding: 0 16px 13px;
 }
 
 .fiab__label {
@@ -595,294 +751,104 @@ h1, h2, h3 { margin: 0; }
 .fiab__value {
   font-family: 'Betclic Condensed', sans-serif;
   font-size: 15px;
-  min-width: 38px;
+  min-width: 40px;
   text-align: right;
 }
 
-/* =========================================================
-   MARCHÉS
-   ========================================================= */
-.marches { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-
-.marche {
+/* --- Barre d'action de la carte --- */
+.cta {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 12px;
   background: var(--card-2);
-  border-radius: 14px;
-  padding: 13px 13px 14px;
-  position: relative;
+  border-top: 1px solid var(--line);
 }
 
-.marche--earlywin { border: 1px solid var(--teal); }
-.marche--xtrawin  { border: 1px solid var(--orange); }
-
-.marche__badge {
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Betclic Condensed', sans-serif;
-  font-size: 12.5px;
-  letter-spacing: .6px;
-  text-transform: uppercase;
-  padding: 3px 12px;
-  border-radius: 999px;
-  white-space: nowrap;
-  color: #06121C;
-}
-
-.marche__badge--earlywin { background: var(--teal); }
-.marche__badge--xtrawin  { background: var(--orange); }
-
-.marche__head {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 11px;
-}
-
-.marche__info {
-  flex: 0 0 auto;
-  width: 17px; height: 17px;
-  border-radius: 50%;
-  border: 1.5px solid var(--text-mute);
-  color: var(--text-mute);
-  font-size: 11px;
-  font-weight: 700;
-  display: grid;
-  place-items: center;
-  background: none;
-  padding: 0;
-  margin-top: 2px;
-}
-
-.marche__titre {
+.cta__boost {
   flex: 1;
-  font-family: 'Betclic Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 17px;
-  line-height: 1.2;
-}
-
-.marche__actions { display: flex; gap: 9px; align-items: center; }
-
-.marche__icon {
   background: none;
-  border: 0;
-  padding: 0;
-  display: flex;
-  color: var(--red-soft);
-}
-
-.marche__icon--stats { color: #4C7DF0; }
-
-/* --- Boutons de mise (remplacent les cotes jaunes) --- */
-.picks {
-  display: grid;
-  gap: 9px;
-  grid-template-columns: repeat(var(--cols, 2), 1fr);
-}
-
-.pick { display: flex; flex-direction: column; gap: 5px; }
-
-.pick__btn {
-  width: 100%;
-  border: 0;
-  background: var(--yellow);
+  border: 1px dashed var(--line);
   border-radius: var(--r-btn);
-  padding: 9px 6px 10px;
-  text-align: center;
-  color: #0A0E1C;
-  transition: transform .12s ease, background .12s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.pick__btn:active { transform: scale(.96); background: var(--yellow-press); }
-
-.pick__label {
-  display: block;
-  font-size: 12.5px;
-  font-weight: 400;
-  line-height: 1.2;
-  margin-bottom: 3px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pick__mise {
-  display: block;
-  font-family: 'Betclic Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 25px;
-  font-style: italic;
-  line-height: 1;
-  letter-spacing: -.3px;
-}
-
-/* état sélectionné : le bouton passe en rouge Betclic */
-.pick__btn.is-picked {
-  background: var(--red);
-  color: #fff;
-}
-
-.pick__btn.is-picked .pick__mise::after {
-  content: ' ✓';
-  font-size: 17px;
-}
-
-.pick__bar {
-  height: 4px;
-  background: var(--card);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.pick__bar span {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: var(--red);
-}
-
-.pick__bar--lead span { background: var(--teal); }
-
-/* --- Carte MyCombi suggérée --- */
-.combi-suggest {
-  background: var(--card-2);
-  border-radius: 14px;
-  padding: 14px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.combi-suggest__lines {
-  flex: 1;
+  color: var(--text);
+  text-align: left;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  position: relative;
-  padding-left: 4px;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
 }
 
-.combi-suggest__line {
+.cta__boost b {
+  font-size: 13.5px;
   display: flex;
-  gap: 9px;
-  align-items: flex-start;
-  position: relative;
+  align-items: center;
+  gap: 6px;
 }
 
-.combi-suggest__dot {
-  flex: 0 0 auto;
+.cta__boost small {
+  font-size: 11.5px;
+  color: var(--text-mute);
+}
+
+.cta__plus {
   width: 17px; height: 17px;
   border-radius: 50%;
   background: var(--red);
   color: #fff;
   font-size: 13px;
-  font-weight: 700;
   display: grid;
   place-items: center;
-  margin-top: 1px;
-}
-
-.combi-suggest__line:first-child::after {
-  content: '';
-  position: absolute;
-  left: 8px;
-  top: 20px;
-  bottom: -12px;
-  width: 1.5px;
-  background: var(--red);
-}
-
-.combi-suggest__t {
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.2;
-}
-
-.combi-suggest__s {
-  font-size: 12.5px;
-  color: var(--text-dim);
-}
-
-.combi-suggest__btn {
   flex: 0 0 auto;
-  background: var(--yellow);
+}
+
+/* Le bouton jaune : la mise en freebets, jamais une cote */
+.cta__go {
+  flex: 0 0 auto;
+  min-width: 118px;
   border: 0;
+  background: var(--yellow);
   border-radius: var(--r-btn);
   padding: 8px 14px 10px;
   text-align: center;
   color: #0A0E1C;
-  transition: transform .12s ease;
+  transition: transform .12s ease, background .12s ease;
 }
 
-.combi-suggest__btn:active { transform: scale(.96); }
-.combi-suggest__btn.is-picked { background: var(--red); color: #fff; }
+.cta__go:active { transform: scale(.96); background: var(--yellow-press); }
 
-.combi-suggest__btn small {
+.cta__go small {
   display: block;
   font-size: 11.5px;
+  line-height: 1.2;
   margin-bottom: 2px;
 }
 
-.combi-suggest__btn b {
+.cta__go b {
+  display: block;
   font-family: 'Betclic Condensed', sans-serif;
-  font-size: 23px;
+  font-size: 25px;
   font-style: italic;
   line-height: 1;
 }
 
-/* =========================================================
-   BETSLIP
-   ========================================================= */
-.slip-fab {
-  position: fixed;
-  left: 50%;
-  bottom: 16px;
-  transform: translateX(-50%);
-  z-index: 45;
-  width: calc(100% - 2 * var(--pad));
-  max-width: calc(var(--maxw) - 2 * var(--pad));
-  background: var(--red);
-  color: #fff;
-  border: 0;
-  border-radius: 14px;
-  padding: 13px 16px;
+.cta__locked {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
-  font-weight: 700;
-  font-size: 16px;
-  animation: pop .22s ease;
-}
-
-@keyframes pop {
-  from { transform: translateX(-50%) translateY(12px); opacity: 0; }
-  to   { transform: translateX(-50%) translateY(0); opacity: 1; }
-}
-
-.slip-fab__count {
-  background: #fff;
-  color: var(--red);
-  min-width: 24px; height: 24px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
+  justify-content: center;
+  gap: 8px;
   font-size: 13px;
-  padding: 0 6px;
+  color: var(--text-mute);
+  font-weight: 700;
+  padding: 12px 0;
 }
 
-.slip-fab__label { flex: 1; text-align: left; }
-
-.slip-fab__stake {
-  font-family: 'Betclic Condensed', sans-serif;
-  font-size: 20px;
-  font-style: italic;
-}
-
-.slip {
+/* =========================================================
+   FICHE RUMEUR / BOOSTERS
+   ========================================================= */
+.sheet {
   position: fixed;
   inset: 0;
   z-index: 60;
@@ -896,164 +862,292 @@ h1, h2, h3 { margin: 0; }
   transition: opacity .2s ease;
 }
 
-.slip.is-open { opacity: 1; pointer-events: auto; }
+.sheet.is-open { opacity: 1; pointer-events: auto; }
 
-.slip__sheet {
+.sheet__panel {
+  position: relative;
   width: 100%;
   max-width: var(--maxw);
-  background: var(--bg-elev);
+  height: 94vh;
+  background: var(--bg);
   border-radius: 20px 20px 0 0;
-  padding: 8px var(--pad) calc(16px + env(safe-area-inset-bottom));
-  max-height: 88vh;
   display: flex;
   flex-direction: column;
-  transform: translateY(100%);
-  transition: transform .26s cubic-bezier(.2, .8, .3, 1);
-}
-
-.slip.is-open .slip__sheet { transform: translateY(0); }
-
-.slip__grab {
-  width: 40px; height: 4px;
-  background: var(--line);
-  border-radius: 999px;
-  margin: 4px auto 10px;
-}
-
-.slip__head {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.slip__title {
-  font-family: 'Betclic Condensed', sans-serif;
-  font-size: 24px;
-  text-transform: uppercase;
-}
-
-.slip__close {
-  margin-left: auto;
-  background: var(--card-2);
-  border: 0;
-  color: #fff;
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  font-size: 14px;
-}
-
-.slip__modes {
-  display: flex;
-  gap: 6px;
-  background: var(--card);
-  border-radius: 10px;
-  padding: 4px;
-  margin-bottom: 12px;
-}
-
-.slip__mode {
-  flex: 1;
-  border: 0;
-  background: none;
-  color: var(--text-mute);
-  font-weight: 700;
-  font-size: 14px;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-.slip__mode.is-active { background: var(--card-2); color: #fff; }
-
-.slip__list {
-  list-style: none;
-  margin: 0 0 12px;
-  padding: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.slip__item {
-  background: var(--card);
-  border-radius: 12px;
-  padding: 11px 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.slip__item-body { flex: 1; min-width: 0; }
-
-.slip__item-pick {
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 1.2;
-}
-
-.slip__item-marche {
-  font-size: 12px;
-  color: var(--text-dim);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  transform: translateY(100%);
+  transition: transform .28s cubic-bezier(.2, .8, .3, 1);
 }
 
-.slip__item-joueur {
-  font-size: 11.5px;
-  color: var(--text-mute);
-  text-transform: uppercase;
-  letter-spacing: .3px;
-  font-weight: 700;
-  margin-top: 2px;
+.sheet.is-open .sheet__panel { transform: translateY(0); }
+
+.sheet__close {
+  position: absolute;
+  top: 12px; right: 12px;
+  z-index: 5;
+  background: rgba(10, 14, 28, .88);
+  border: 1px solid var(--line);
+  color: #fff;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  font-size: 15px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
 }
 
-.slip__item-stake {
+.sheet__scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* En-tête de la fiche */
+.sheet__hero {
+  position: relative;
+  padding: 20px 16px 16px;
+  background: linear-gradient(115deg, var(--from-color, #222) -10%, #171D31 55%, var(--to-color, #333) 130%);
+}
+
+.sheet__hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(-60deg, rgba(255,255,255,.05) 0 1px, transparent 1px 18px);
+  pointer-events: none;
+}
+
+.sheet__joueur {
+  position: relative;
+  z-index: 1;
   font-family: 'Betclic Condensed', sans-serif;
-  font-size: 19px;
-  font-style: italic;
-  color: var(--yellow);
+  font-size: 30px;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
-.slip__item-del {
-  background: none;
-  border: 0;
-  color: var(--text-mute);
-  font-size: 17px;
-  padding: 2px 0 2px 4px;
+.sheet__meta {
+  position: relative;
+  z-index: 1;
+  font-size: 13px;
+  color: rgba(255,255,255,.75);
+  margin-top: 4px;
 }
 
-.slip__empty {
-  text-align: center;
-  color: var(--text-mute);
+.sheet__route {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  flex-wrap: wrap;
+}
+
+/* Corps de la fiche */
+.sheet__section { padding: 16px; }
+
+.sheet__article-titre {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 20px;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.sheet__article-texte {
   font-size: 14px;
-  padding: 26px 0 30px;
+  color: var(--text-dim);
+  line-height: 1.6;
   margin: 0;
 }
 
-.slip__empty b { color: var(--yellow); }
-.slip__empty span { font-size: 13px; }
-
-.slip__foot { border-top: 1px solid var(--line); padding-top: 12px; }
-
-.slip__row {
+/* Le guess de base, toujours acquis */
+.base {
+  margin: 0 16px;
+  background: var(--card);
+  border: 1px solid var(--teal);
+  border-radius: 14px;
+  padding: 13px 14px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 14px;
-  color: var(--text-dim);
-  margin-bottom: 6px;
+  gap: 12px;
 }
 
-.slip__row strong {
+.base__check {
+  flex: 0 0 auto;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #06121C;
+  font-size: 13px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.base__texte { flex: 1; min-width: 0; display: block; }
+
+.base__t {
+  display: block;
+  font-weight: 700;
+  font-size: 14.5px;
+  line-height: 1.25;
+}
+
+.base__s {
+  display: block;
+  font-size: 12px;
+  color: var(--text-mute);
+  margin-top: 2px;
+}
+
+.base__gain {
+  flex: 0 0 auto;
+  background: var(--yellow);
+  color: #0A0E1C;
+  border-radius: var(--r-btn);
+  padding: 6px 12px 8px;
+  text-align: center;
+}
+
+.base__gain b {
+  display: block;
   font-family: 'Betclic Condensed', sans-serif;
-  font-size: 19px;
-  color: #fff;
+  font-size: 22px;
+  font-style: italic;
+  line-height: 1;
 }
 
-.slip__row--gain strong { color: var(--teal); }
+/* Groupes de sélections additionnelles */
+.boosters { padding: 18px 16px 20px; }
 
-.slip__submit {
+.boosters__intro {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 20px;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.boosters__sub {
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 0 0 16px;
+}
+
+.groupe { margin-bottom: 18px; }
+
+.groupe__titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 17px;
+  margin-bottom: 9px;
+}
+
+.groupe__num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--card-2);
+  color: var(--text-dim);
+  font-size: 11px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.groupe.is-filled .groupe__num { background: var(--teal); color: #06121C; }
+
+.options { display: flex; flex-direction: column; gap: 8px; }
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 12px;
+  color: #fff;
+  text-align: left;
+  transition: transform .12s ease, border-color .12s ease, background .12s ease;
+}
+
+.option:active { transform: scale(.985); }
+
+.option__radio {
+  flex: 0 0 auto;
+  width: 19px; height: 19px;
+  border-radius: 50%;
+  border: 2px solid var(--text-mute);
+  display: grid;
+  place-items: center;
+}
+
+.option__radio::after {
+  content: '';
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.option__label { flex: 1; font-size: 14.5px; font-weight: 700; }
+
+.option__bonus {
+  flex: 0 0 auto;
+  background: var(--yellow);
+  color: #0A0E1C;
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 17px;
+  font-style: italic;
+  border-radius: 7px;
+  padding: 4px 9px 5px;
+  line-height: 1;
+}
+
+.option.is-selected {
+  background: rgba(227, 6, 19, .14);
+  border-color: var(--red);
+}
+
+.option.is-selected .option__radio { border-color: var(--red); }
+.option.is-selected .option__radio::after { background: var(--red); }
+
+/* Pied collant de la fiche */
+.sheet__foot {
+  border-top: 1px solid var(--line);
+  background: var(--bg-elev);
+  padding: 12px var(--pad) calc(14px + env(safe-area-inset-bottom));
+}
+
+.sheet__total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.sheet__total-label {
+  font-size: 13px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  font-weight: 700;
+}
+
+.sheet__total-value {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 34px;
+  font-style: italic;
+  color: var(--yellow);
+  line-height: 1;
+  transition: transform .25s ease;
+}
+
+.sheet__total-value.is-bumped { transform: scale(1.15); }
+
+.sheet__submit {
   width: 100%;
   border: 0;
   border-radius: 12px;
@@ -1061,21 +1155,14 @@ h1, h2, h3 { margin: 0; }
   color: #fff;
   font-weight: 700;
   font-size: 17px;
-  padding: 14px;
-  margin-top: 6px;
+  padding: 15px;
 }
 
-.slip__submit:disabled { background: var(--card-2); color: var(--text-mute); }
-
-.slip__clear {
-  width: 100%;
-  background: none;
-  border: 0;
+.sheet__hint {
+  margin: 8px 0 0;
+  font-size: 11.5px;
   color: var(--text-mute);
-  font-size: 13px;
-  padding: 10px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-align: center;
 }
 
 /* =========================================================
@@ -1084,30 +1171,25 @@ h1, h2, h3 { margin: 0; }
 .toast {
   position: fixed;
   left: 50%;
-  bottom: 88px;
+  bottom: 26px;
   transform: translate(-50%, 14px);
-  z-index: 70;
+  z-index: 80;
   background: #fff;
   color: #0A0E1C;
   font-weight: 700;
   font-size: 14px;
-  padding: 10px 16px;
+  padding: 11px 20px;
   border-radius: 999px;
   box-shadow: 0 8px 24px rgba(0,0,0,.45);
   opacity: 0;
   pointer-events: none;
   transition: opacity .2s ease, transform .2s ease;
-  white-space: nowrap;
-  max-width: calc(100vw - 32px);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  width: max-content;
+  max-width: calc(100vw - 24px);
+  text-align: center;
 }
 
 .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
-
-/* Panier ouvert : le toast remonte pour ne pas masquer le bouton « Parier » */
-body.slip-open .toast { bottom: auto; top: 74px; transform: translate(-50%, -14px); }
-body.slip-open .toast.is-visible { transform: translate(-50%, 0); }
 
 /* =========================================================
    FOOTER
@@ -1115,7 +1197,7 @@ body.slip-open .toast.is-visible { transform: translate(-50%, 0); }
 .footer {
   max-width: var(--maxw);
   margin: 26px auto 0;
-  padding: 20px var(--pad) 0;
+  padding: 20px var(--pad) 30px;
   border-top: 1px solid var(--line);
   color: var(--text-mute);
   font-size: 11.5px;

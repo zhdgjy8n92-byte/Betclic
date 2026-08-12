@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Betclic Mercat'odds — Pariez sur les rumeurs du mercato</title>
-<meta name="description" content="Betclic Mercat'odds : toutes les rumeurs de transfert du mercato, et 5 € à miser sur chacune d'elles.">
+<title>Betclic Mercat'odds — Le guess du jour</title>
+<meta name="description" content="Betclic Mercat'odds : un guess par jour. Devinez le transfert qui sera officialisé aujourd'hui et gagnez des freebets.">
 <meta name="theme-color" content="#0A0E1C">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23E30613'/><text x='16' y='23' font-family='Arial' font-size='20' font-weight='bold' font-style='italic' fill='white' text-anchor='middle'>B</text></svg>">
@@ -15,20 +15,18 @@
 <header class="topbar">
   <div class="topbar__inner">
     <a class="brand" href="./" aria-label="Betclic Mercat'odds — accueil">
-      <span class="brand__logo"><span class="brand__logo-text">Betclic</span></span>
-      <span class="brand__product">Mercat<span class="brand__apos">'</span>odds</span>
+      <span class="oplogo oplogo--inline">
+        <span class="oplogo__betclic"><span class="oplogo__betclic-text">Betclic</span></span>
+        <span class="oplogo__word" data-text="Mercat'odds">Mercat'odds</span>
+      </span>
     </a>
 
     <div class="wallet">
       <span class="wallet__chip wallet__chip--freebet">
-        <span class="wallet__icon" aria-hidden="true">F</span>51 €
+        <span class="wallet__icon" aria-hidden="true">F</span><span id="wallet-freebets">51 €</span>
       </span>
-      <span class="wallet__chip wallet__chip--solde">
-        <span class="wallet__icon wallet__icon--plus" aria-hidden="true">+</span>50 €
-      </span>
-      <button class="wallet__medal" type="button" aria-label="Missions">🏅</button>
       <button class="wallet__avatar" type="button" aria-label="Mon compte">
-        <span class="wallet__avatar-face" aria-hidden="true">👤</span>
+        <span aria-hidden="true">👤</span>
         <span class="wallet__badge">5</span>
       </button>
     </div>
@@ -40,45 +38,49 @@
   <div class="hero__stripes" aria-hidden="true"></div>
   <div class="hero__inner">
     <p class="hero__kicker">
-      <span class="hero__ball" aria-hidden="true">⚽</span>
-      Mercato d'été 2026 <span class="dot">•</span> Marché des rumeurs
+      <span aria-hidden="true">⚽</span>
+      Mercato d'été <span class="dot">•</span> <span id="hero-date">Aujourd'hui</span>
     </p>
-    <h1 class="hero__title">Mercat<span class="brand__apos">'</span>odds</h1>
-    <p class="hero__baseline">Les rumeurs du mercato deviennent des paris. <strong>5 €</strong> sur chaque pronostic.</p>
 
-    <div class="hero__countdown" id="countdown" aria-live="polite">
-      <span class="hero__countdown-label">Fermeture du mercato dans</span>
+    <h1 class="hero__logo">
+      <span class="oplogo oplogo--stack">
+        <span class="oplogo__betclic"><span class="oplogo__betclic-text">Betclic</span></span>
+        <span class="oplogo__word" data-text="Mercat'odds">Mercat'odds</span>
+      </span>
+    </h1>
+
+    <p class="hero__title">Le guess du jour</p>
+    <p class="hero__baseline">
+      Un seul pronostic par jour. Désignez le transfert qui sera
+      <strong>officialisé aujourd'hui</strong> et repartez avec des freebets.
+    </p>
+
+    <div class="streak">
+      <div class="streak__row" id="streak-row"></div>
+      <p class="streak__label" id="streak-label"></p>
+    </div>
+
+    <div class="hero__countdown">
+      <span class="hero__countdown-label" id="countdown-label">Guess ouvert encore</span>
       <span class="hero__countdown-value" id="countdown-value">—</span>
     </div>
   </div>
 </section>
 
-<!-- ============ TABS ============ -->
-<nav class="tabs" aria-label="Sections">
-  <button class="tabs__item tabs__item--combi" type="button" data-open-slip>
-    <span class="tabs__combi-icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-        <rect x="3" y="4" width="13" height="16" rx="3"/><path d="M19 9v8M23 13h-8"/>
-      </svg>
-    </span>
-    MyCombi
-    <span class="tabs__combi-count" id="tab-combi-count" hidden>0</span>
-  </button>
-  <button class="tabs__item is-active" type="button" data-filter="tous">Le Top</button>
-  <button class="tabs__item" type="button" data-filter="chaud">🔥 Chauds</button>
-  <button class="tabs__item" type="button" data-filter="Ligue 1">Ligue 1</button>
-  <button class="tabs__item" type="button" data-filter="Liga">Liga</button>
-  <button class="tabs__item" type="button" data-filter="Premier League">Premier League</button>
-</nav>
+<!-- ============ GUESS VALIDÉ ============ -->
+<section class="ticket" id="ticket" hidden aria-live="polite"></section>
 
 <!-- ============ FEED ============ -->
-<main class="feed" id="feed">
-  <p class="feed__empty" id="feed-empty" hidden>Aucune rumeur pour ce filtre.</p>
-</main>
+<div class="feed-head" id="feed-head">
+  <h2 class="feed-head__title">Les rumeurs du jour</h2>
+  <p class="feed-head__sub">Touchez <b>5 €</b> pour valider votre guess, ou ouvrez une rumeur pour booster vos freebets.</p>
+</div>
+
+<main class="feed" id="feed"></main>
 
 <footer class="footer">
   <p class="footer__legal">
-    <strong>Betclic Mercat'odds</strong> — projet de démonstration. Les rumeurs, cotes et
+    <strong>Betclic Mercat'odds</strong> — projet de démonstration. Les rumeurs et
     montants affichés sont fictifs et n'engagent aucun club ni joueur.
   </p>
   <p class="footer__anj">
@@ -88,42 +90,18 @@
   </p>
 </footer>
 
-<!-- ============ BETSLIP (MyCombi) ============ -->
-<button class="slip-fab" id="slip-fab" type="button" hidden data-open-slip>
-  <span class="slip-fab__count" id="slip-fab-count">0</span>
-  <span class="slip-fab__label">MyCombi</span>
-  <span class="slip-fab__stake" id="slip-fab-stake">5 €</span>
-</button>
-
-<aside class="slip" id="slip" aria-label="Mon panier de paris" aria-hidden="true">
-  <div class="slip__sheet" role="dialog" aria-modal="true" aria-labelledby="slip-title">
-    <div class="slip__grab" aria-hidden="true"></div>
-    <header class="slip__head">
-      <h2 class="slip__title" id="slip-title">MyCombi</h2>
-      <button class="slip__close" type="button" data-close-slip aria-label="Fermer">✕</button>
-    </header>
-
-    <div class="slip__modes" role="tablist">
-      <button class="slip__mode is-active" type="button" data-mode="simple" role="tab" aria-selected="true">Paris simples</button>
-      <button class="slip__mode" type="button" data-mode="combi" role="tab" aria-selected="false">Combiné</button>
-    </div>
-
-    <ul class="slip__list" id="slip-list"></ul>
-    <p class="slip__empty" id="slip-empty">
-      Votre MyCombi est vide.<br><span>Touchez un bouton <b>5 €</b> pour ajouter une rumeur.</span>
-    </p>
-
-    <div class="slip__foot">
-      <div class="slip__row">
-        <span>Mise totale</span>
-        <strong id="slip-stake">0 €</strong>
+<!-- ============ FICHE RUMEUR / BOOSTERS ============ -->
+<aside class="sheet" id="sheet" aria-hidden="true">
+  <div class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheet-joueur">
+    <button class="sheet__close" type="button" data-close-sheet aria-label="Fermer">✕</button>
+    <div class="sheet__scroll" id="sheet-scroll"></div>
+    <div class="sheet__foot">
+      <div class="sheet__total">
+        <span class="sheet__total-label">Freebets à gagner</span>
+        <strong class="sheet__total-value" id="sheet-total">5 €</strong>
       </div>
-      <div class="slip__row slip__row--gain">
-        <span>Gain potentiel</span>
-        <strong id="slip-gain">0,00 €</strong>
-      </div>
-      <button class="slip__submit" type="button" id="slip-submit" disabled>Parier</button>
-      <button class="slip__clear" type="button" id="slip-clear">Tout retirer</button>
+      <button class="sheet__submit" type="button" id="sheet-submit">Valider mon guess</button>
+      <p class="sheet__hint" id="sheet-hint">Chaque sélection ajoutée augmente la cagnotte, mais doit être juste pour être payée.</p>
     </div>
   </div>
 </aside>

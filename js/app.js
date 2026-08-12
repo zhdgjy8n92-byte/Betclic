@@ -1,69 +1,56 @@
 /* =========================================================
    Betclic Mercat'odds — logique applicative
    ---------------------------------------------------------
-   Principe : chaque sélection vaut une mise fixe de MISE (5 €).
-   Les boutons n'affichent donc jamais de cote, seulement « 5 € ».
-   Les cotes servent uniquement au calcul du gain potentiel.
+   Un seul guess par jour. Le joueur désigne le transfert qu'il
+   pense voir officialisé dans la journée : s'il tombe juste, il
+   empoche des freebets. Il peut gonfler la cagnotte en ajoutant
+   des sélections complémentaires depuis la fiche de la rumeur.
+
+   Aucune cote n'est affichée : tout est exprimé en euros de freebets.
    ========================================================= */
 (function () {
   'use strict';
 
-  var MISE = 5;
-  var DEADLINE = '2026-09-01T22:00:00';
-  var STORAGE_KEY = 'mercatodds.slip';
+  var STORAGE_KEY = 'mercatodds.guess';
 
   var rumeurs = window.MERCATODDS_RUMEURS || [];
+  var historique = window.MERCATODDS_HISTORIQUE || [];
 
   /* ---------- État ---------- */
-  var selections = charger();
-  var filtreActif = 'tous';
-  var modeCombi = 'simple';
+  var guess = null;      // guess validé du jour
+  var brouillon = null;  // fiche en cours d'édition
 
   /* ---------- Raccourcis DOM ---------- */
   var $ = function (sel, ctx) { return (ctx || document).querySelector(sel); };
   var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); };
 
   var feed = $('#feed');
-  var feedEmpty = $('#feed-empty');
-  var slip = $('#slip');
-  var slipList = $('#slip-list');
-  var slipEmpty = $('#slip-empty');
-  var slipFab = $('#slip-fab');
+  var sheet = $('#sheet');
+  var sheetScroll = $('#sheet-scroll');
+  var ticketEl = $('#ticket');
   var toastEl = $('#toast');
 
   /* =========================================================
      Utilitaires
      ========================================================= */
-  function euros(n) {
-    return n.toFixed(2).replace('.', ',') + ' €';
-  }
-
   function echapper(str) {
     return String(str).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
 
-  function charger() {
-    try {
-      var brut = localStorage.getItem(STORAGE_KEY);
-      return brut ? JSON.parse(brut) : [];
-    } catch (e) {
-      return [];
-    }
+  function jourISO(d) {
+    d = d || new Date();
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
   }
 
-  function sauver() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(selections));
-    } catch (e) { /* mode privé : on ignore */ }
-  }
-
-  function indexDe(cle) {
-    for (var i = 0; i < selections.length; i++) {
-      if (selections[i].cle === cle) return i;
+  function trouverRumeur(id) {
+    for (var i = 0; i < rumeurs.length; i++) {
+      if (rumeurs[i].id === id) return rumeurs[i];
     }
-    return -1;
+    return null;
   }
 
   function toast(msg) {
@@ -72,11 +59,58 @@
     clearTimeout(toast._t);
     toast._t = setTimeout(function () {
       toastEl.classList.remove('is-visible');
-    }, 2000);
+    }, 2600);
+  }
+
+  /* ---------- Persistance ---------- */
+  function charger() {
+    try {
+      var brut = localStorage.getItem(STORAGE_KEY);
+      if (!brut) return null;
+      var g = JSON.parse(brut);
+      // Un guess n'est valable que pour sa journée.
+      return g && g.date === jourISO() ? g : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function sauver() {
+    try {
+      if (guess) localStorage.setItem(STORAGE_KEY, JSON.stringify(guess));
+      else localStorage.removeItem(STORAGE_KEY);
+    } catch (e) { /* mode privé : on ignore */ }
+  }
+
+  /* ---------- Calcul de la cagnotte ---------- */
+  function calculerGain(rumeur, selections) {
+    var total = rumeur.gainBase;
+    rumeur.boosters.forEach(function (groupe) {
+      var idx = selections[groupe.id];
+      if (idx !== undefined && groupe.options[idx]) {
+        total += groupe.options[idx].bonus;
+      }
+    });
+    return total;
+  }
+
+  function detailSelections(rumeur, selections) {
+    var lignes = [];
+    rumeur.boosters.forEach(function (groupe) {
+      var idx = selections[groupe.id];
+      if (idx !== undefined && groupe.options[idx]) {
+        lignes.push({
+          titre: groupe.options[idx].label,
+          sous: groupe.titre,
+          bonus: groupe.options[idx].bonus
+        });
+      }
+    });
+    return lignes;
   }
 
   /* =========================================================
-     Rendu du fil de rumeurs
+     Fil de rumeurs
      ========================================================= */
   function classeFiabilite(v) {
     if (v >= 70) return '';
@@ -84,135 +118,81 @@
     return ' fiab__fill--low';
   }
 
-  function gabaritPick(rumeur, marche, mIndex, pick, pIndex, meneur) {
-    var cle = rumeur.id + '|' + mIndex + '|' + pIndex;
-    var choisi = indexDe(cle) !== -1;
+  function gabaritRoute(rumeur) {
     return (
-      '<div class="pick">' +
-        '<button class="pick__btn' + (choisi ? ' is-picked' : '') + '" type="button"' +
-          ' data-cle="' + cle + '"' +
-          ' data-rumeur="' + rumeur.id + '"' +
-          ' data-marche="' + mIndex + '"' +
-          ' data-pick="' + pIndex + '"' +
-          ' aria-pressed="' + choisi + '">' +
-          '<span class="pick__label">' + echapper(pick.label) + '</span>' +
-          '<span class="pick__mise">' + MISE + ' €</span>' +
-        '</button>' +
-        '<div class="pick__bar' + (pIndex === meneur ? ' pick__bar--lead' : '') + '">' +
-          '<span style="width:' + pick.part + '%"></span>' +
-        '</div>' +
-      '</div>'
-    );
-  }
-
-  function gabaritMarche(rumeur, marche, mIndex) {
-    var meneur = 0;
-    marche.picks.forEach(function (p, i) {
-      if (p.part > marche.picks[meneur].part) meneur = i;
-    });
-
-    var modif = '';
-    if (marche.type === 'earlywin') modif = ' marche--earlywin';
-    if (marche.type === 'xtrawin') modif = ' marche--xtrawin';
-
-    var badge = '';
-    if (marche.badge === 'EarlyWin') {
-      badge = '<span class="marche__badge marche__badge--earlywin">⏱ EarlyWin</span>';
-    } else if (marche.badge === 'XTRAWIN') {
-      badge = '<span class="marche__badge marche__badge--xtrawin">XtraWin</span>';
-    }
-
-    var picks = marche.picks.map(function (p, i) {
-      return gabaritPick(rumeur, marche, mIndex, p, i, meneur);
-    }).join('');
-
-    return (
-      '<section class="marche' + modif + '">' +
-        badge +
-        '<div class="marche__head">' +
-          '<button class="marche__info" type="button" aria-label="Règles du marché">i</button>' +
-          '<h3 class="marche__titre">' + echapper(marche.titre) + '</h3>' +
-          '<div class="marche__actions">' +
-            '<button class="marche__icon" type="button" aria-label="Ajouter au MyCombi">' +
-              '<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">' +
-                '<rect x="3" y="4" width="12" height="16" rx="3"/><path d="M19 9v8M23 13h-8"/></svg>' +
-            '</button>' +
-            '<button class="marche__icon marche__icon--stats" type="button" aria-label="Statistiques">' +
-              '<svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor">' +
-                '<rect x="3" y="10" width="4" height="11" rx="1"/>' +
-                '<rect x="10" y="4" width="4" height="17" rx="1"/>' +
-                '<rect x="17" y="14" width="4" height="7" rx="1"/></svg>' +
-            '</button>' +
-          '</div>' +
-        '</div>' +
-        '<div class="picks" style="--cols:' + marche.picks.length + '">' + picks + '</div>' +
-      '</section>'
-    );
-  }
-
-  function gabaritCombi(rumeur) {
-    if (!rumeur.combi) return '';
-    var cle = rumeur.id + '|combi';
-    var choisi = indexDe(cle) !== -1;
-
-    var lignes = rumeur.combi.lignes.map(function (l) {
-      return (
-        '<div class="combi-suggest__line">' +
-          '<span class="combi-suggest__dot" aria-hidden="true">+</span>' +
-          '<div>' +
-            '<div class="combi-suggest__t">' + echapper(l.titre) + '</div>' +
-            '<div class="combi-suggest__s">' + echapper(l.sous) + '</div>' +
-          '</div>' +
-        '</div>'
-      );
-    }).join('');
-
-    return (
-      '<div class="combi-suggest">' +
-        '<div class="combi-suggest__lines">' + lignes + '</div>' +
-        '<button class="combi-suggest__btn' + (choisi ? ' is-picked' : '') + '" type="button"' +
-          ' data-cle="' + cle + '" data-rumeur="' + rumeur.id + '" data-combi="1"' +
-          ' aria-pressed="' + choisi + '">' +
-          '<small>MyCombi</small><b>' + MISE + ' €</b>' +
-        '</button>' +
-      '</div>'
+      '<span class="rumeur__club"><i class="rumeur__crest" style="background:' + rumeur.clubActuel.couleur + '"></i>' + echapper(rumeur.clubActuel.nom) + '</span>' +
+      '<span class="rumeur__arrow" aria-label="vers">→</span>' +
+      '<span class="rumeur__club"><i class="rumeur__crest" style="background:' + rumeur.clubCible.couleur + '"></i>' + echapper(rumeur.clubCible.nom) + '</span>'
     );
   }
 
   function gabaritRumeur(rumeur) {
-    var marches = rumeur.marches.map(function (m, i) {
-      return gabaritMarche(rumeur, m, i);
-    }).join('');
+    var estChoisi = guess && guess.rumeurId === rumeur.id;
+    var estBloque = guess && !estChoisi;
+
+    var classes = 'rumeur';
+    if (rumeur.chaud && !guess) classes += ' is-hot';
+    if (estChoisi) classes += ' is-chosen';
+    if (estBloque) classes += ' is-locked';
+
+    var pastille = '';
+    if (estChoisi) {
+      pastille = '<span class="pill pill--chosen">✓ Ton guess</span>';
+    } else if (rumeur.chaud && !guess) {
+      pastille = '<span class="pill pill--hot">🔥 Chaud</span>';
+    }
+
+    // Barre d'action : bouton jaune de validation, ou état verrouillé
+    var cta;
+    if (estBloque) {
+      cta = '<div class="cta"><div class="cta__locked">🔒 Guess du jour déjà utilisé</div></div>';
+    } else if (estChoisi) {
+      cta =
+        '<div class="cta">' +
+          '<button class="cta__boost" type="button" data-ouvrir="' + rumeur.id + '">' +
+            '<b><span class="cta__plus" aria-hidden="true">+</span>Modifier</b>' +
+            '<small>Ajuster mes sélections</small>' +
+          '</button>' +
+          '<button class="cta__go" type="button" data-ouvrir="' + rumeur.id + '">' +
+            '<small>À gagner</small><b>' + guess.gain + ' €</b>' +
+          '</button>' +
+        '</div>';
+    } else {
+      cta =
+        '<div class="cta">' +
+          '<button class="cta__boost" type="button" data-ouvrir="' + rumeur.id + '">' +
+            '<b><span class="cta__plus" aria-hidden="true">+</span>Ajouter des sélections</b>' +
+            '<small>Club, heure, montant…</small>' +
+          '</button>' +
+          '<button class="cta__go" type="button" data-valider="' + rumeur.id + '">' +
+            '<small>Guess du jour</small><b>' + rumeur.gainBase + ' €</b>' +
+          '</button>' +
+        '</div>';
+    }
 
     return (
-      '<article class="rumeur' + (rumeur.chaud ? ' is-hot' : '') + '" data-id="' + rumeur.id + '"' +
-        ' data-competition="' + echapper(rumeur.competition) + '" data-chaud="' + (rumeur.chaud ? '1' : '0') + '">' +
+      '<article class="' + classes + '" data-id="' + rumeur.id + '">' +
+        '<button class="rumeur__banner" type="button" data-ouvrir="' + rumeur.id + '"' +
+          ' style="--from-color:' + rumeur.clubActuel.couleur + ';--to-color:' + rumeur.clubCible.couleur + '">' +
+          (pastille ? '<div class="rumeur__flags">' + pastille + '</div>' : '') +
+          '<span class="rumeur__avatar">' + echapper(rumeur.initiales) + '</span>' +
+          '<span class="rumeur__ident">' +
+            '<span class="rumeur__name">' + echapper(rumeur.joueur) +
+              '<span class="rumeur__flag">' + rumeur.nationalite + '</span></span>' +
+            '<span class="rumeur__meta">' + echapper(rumeur.poste) + ' <span class="dot">•</span> ' + rumeur.age + ' ans</span>' +
+            '<span class="rumeur__route">' + gabaritRoute(rumeur) +
+              '<span class="rumeur__fee">' + echapper(rumeur.montant) + '</span></span>' +
+          '</span>' +
+        '</button>' +
 
-        '<div class="rumeur__banner" style="--from-color:' + rumeur.clubActuel.couleur + ';--to-color:' + rumeur.clubCible.couleur + '">' +
-          (rumeur.chaud ? '<div class="rumeur__flags"><span class="pill pill--hot">🔥 Chaud</span></div>' : '') +
-          '<div class="rumeur__avatar">' + echapper(rumeur.initiales) + '</div>' +
-          '<div class="rumeur__ident">' +
-            '<h2 class="rumeur__name">' + echapper(rumeur.joueur) +
-              '<span class="rumeur__flag">' + rumeur.nationalite + '</span></h2>' +
-            '<div class="rumeur__meta">' + echapper(rumeur.poste) + ' <span class="dot">•</span> ' + rumeur.age + ' ans</div>' +
-            '<div class="rumeur__route">' +
-              '<span class="rumeur__club"><i class="rumeur__crest" style="background:' + rumeur.clubActuel.couleur + '"></i>' + echapper(rumeur.clubActuel.nom) + '</span>' +
-              '<span class="rumeur__arrow" aria-label="vers">→</span>' +
-              '<span class="rumeur__club"><i class="rumeur__crest" style="background:' + rumeur.clubCible.couleur + '"></i>' + echapper(rumeur.clubCible.nom) + '</span>' +
-              '<span class="rumeur__fee">' + echapper(rumeur.montant) + '</span>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-
-        '<div class="rumeur__article">' +
-          '<div class="rumeur__source">' +
+        '<button class="rumeur__article" type="button" data-ouvrir="' + rumeur.id + '">' +
+          '<span class="rumeur__source">' +
             '<span class="rumeur__source-name">' + echapper(rumeur.source) + '</span>' +
             '<span class="dot">•</span>' + echapper(rumeur.tempsSource) +
-          '</div>' +
-          '<h3 class="rumeur__titre">' + echapper(rumeur.titre) + '</h3>' +
-          '<p class="rumeur__chapo">' + echapper(rumeur.chapo) + '</p>' +
-          '<button class="rumeur__more" type="button" data-more>Lire la suite</button>' +
-        '</div>' +
+          '</span>' +
+          '<span class="rumeur__titre">' + echapper(rumeur.titre) + '</span>' +
+          '<span class="rumeur__chapo">' + echapper(rumeur.chapo) + '</span>' +
+        '</button>' +
 
         '<div class="fiab">' +
           '<span class="fiab__label">Indice de fiabilité</span>' +
@@ -220,264 +200,329 @@
           '<span class="fiab__value">' + rumeur.fiabilite + ' %</span>' +
         '</div>' +
 
-        '<div class="marches">' + marches + gabaritCombi(rumeur) + '</div>' +
+        cta +
       '</article>'
     );
   }
 
-  function rendre() {
+  function rendreFeed() {
     feed.innerHTML = rumeurs.map(gabaritRumeur).join('');
-    feed.appendChild(feedEmpty);
-    appliquerFiltre();
   }
 
   /* =========================================================
-     Filtres
+     Ticket du guess validé
      ========================================================= */
-  function appliquerFiltre() {
-    var visibles = 0;
-    $$('.rumeur', feed).forEach(function (el) {
-      var ok =
-        filtreActif === 'tous' ||
-        (filtreActif === 'chaud' && el.dataset.chaud === '1') ||
-        el.dataset.competition === filtreActif;
-      el.hidden = !ok;
-      if (ok) visibles++;
-    });
-    feedEmpty.hidden = visibles > 0;
-  }
-
-  /* =========================================================
-     Sélections / panier
-     ========================================================= */
-  function trouverRumeur(id) {
-    for (var i = 0; i < rumeurs.length; i++) {
-      if (rumeurs[i].id === id) return rumeurs[i];
-    }
-    return null;
-  }
-
-  function basculer(btn) {
-    var cle = btn.dataset.cle;
-    var rumeur = trouverRumeur(btn.dataset.rumeur);
-    if (!rumeur) return;
-
-    var i = indexDe(cle);
-    if (i !== -1) {
-      selections.splice(i, 1);
-      btn.classList.remove('is-picked');
-      btn.setAttribute('aria-pressed', 'false');
-    } else {
-      var entree;
-      if (btn.dataset.combi) {
-        entree = {
-          cle: cle,
-          joueur: rumeur.joueur,
-          marche: 'MyCombi ' + rumeur.clubCible.nom,
-          pick: rumeur.combi.lignes.map(function (l) { return l.titre; }).join(' + '),
-          cote: rumeur.combi.cote
-        };
-      } else {
-        var marche = rumeur.marches[+btn.dataset.marche];
-        var pick = marche.picks[+btn.dataset.pick];
-        entree = {
-          cle: cle,
-          joueur: rumeur.joueur,
-          marche: marche.titre,
-          pick: pick.label,
-          cote: pick.cote
-        };
-      }
-      selections.push(entree);
-      btn.classList.add('is-picked');
-      btn.setAttribute('aria-pressed', 'true');
-      toast('5 € ajoutés : ' + entree.pick);
+  function rendreTicket() {
+    if (!guess) {
+      ticketEl.hidden = true;
+      ticketEl.innerHTML = '';
+      return;
     }
 
-    sauver();
-    majPanier();
-  }
+    var rumeur = trouverRumeur(guess.rumeurId);
+    if (!rumeur) { ticketEl.hidden = true; return; }
 
-  function retirer(cle) {
-    var i = indexDe(cle);
-    if (i === -1) return;
-    selections.splice(i, 1);
-    sauver();
+    var lignes = [{
+      titre: 'Transfert officialisé aujourd\'hui',
+      sous: rumeur.joueur + ' quitte ' + rumeur.clubActuel.nom,
+      bonus: rumeur.gainBase
+    }].concat(detailSelections(rumeur, guess.selections));
 
-    var btn = document.querySelector('[data-cle="' + cle + '"]');
-    if (btn) {
-      btn.classList.remove('is-picked');
-      btn.setAttribute('aria-pressed', 'false');
-    }
-    majPanier();
-  }
-
-  function totaux() {
-    var n = selections.length;
-    if (!n) return { mise: 0, gain: 0 };
-
-    if (modeCombi === 'combi') {
-      var coteTotale = selections.reduce(function (acc, s) { return acc * s.cote; }, 1);
-      return { mise: MISE, gain: MISE * coteTotale };
-    }
-
-    var gain = selections.reduce(function (acc, s) { return acc + MISE * s.cote; }, 0);
-    return { mise: MISE * n, gain: gain };
-  }
-
-  function majPanier() {
-    var n = selections.length;
-    var t = totaux();
-
-    // Bandeau flottant
-    slipFab.hidden = n === 0;
-    $('#slip-fab-count').textContent = n;
-    $('#slip-fab-stake').textContent = t.mise + ' €';
-
-    // Compteur d'onglet
-    var tabCount = $('#tab-combi-count');
-    tabCount.hidden = n === 0;
-    tabCount.textContent = n;
-
-    // Liste
-    slipList.innerHTML = selections.map(function (s) {
-      return (
-        '<li class="slip__item">' +
-          '<div class="slip__item-body">' +
-            '<div class="slip__item-pick">' + echapper(s.pick) + '</div>' +
-            '<div class="slip__item-marche">' + echapper(s.marche) + '</div>' +
-            '<div class="slip__item-joueur">' + echapper(s.joueur) + '</div>' +
+    ticketEl.innerHTML =
+      '<div class="ticket__card">' +
+        '<div class="ticket__top">🎟️ Ton guess du jour</div>' +
+        '<div class="ticket__body">' +
+          '<h2 class="ticket__joueur">' + echapper(rumeur.joueur) + '</h2>' +
+          '<p class="ticket__route">' + echapper(rumeur.clubActuel.nom) + ' → ' + echapper(rumeur.clubCible.nom) + '</p>' +
+          '<ul class="ticket__lignes">' +
+            lignes.map(function (l) {
+              return (
+                '<li class="ticket__ligne">' +
+                  '<span class="ticket__check" aria-hidden="true">✓</span>' +
+                  '<span><b>' + echapper(l.titre) + '</b>' +
+                    '<span class="ticket__ligne-sous">' + echapper(l.sous) + '</span></span>' +
+                  '<span class="ticket__ligne-bonus">' + l.bonus + ' €</span>' +
+                '</li>'
+              );
+            }).join('') +
+          '</ul>' +
+          '<div class="ticket__total">' +
+            '<span class="ticket__total-label">Freebets à gagner</span>' +
+            '<span class="ticket__total-value">' + guess.gain + ' €</span>' +
           '</div>' +
-          '<span class="slip__item-stake">' + MISE + ' €</span>' +
-          '<button class="slip__item-del" type="button" data-del="' + s.cle + '" aria-label="Retirer">✕</button>' +
-        '</li>'
+          '<div class="ticket__actions">' +
+            '<button class="ticket__edit" type="button" data-ouvrir="' + rumeur.id + '">Modifier</button>' +
+            '<button class="ticket__cancel" type="button" id="ticket-cancel">Annuler mon guess</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    ticketEl.hidden = false;
+  }
+
+  /* =========================================================
+     Série de guess
+     ========================================================= */
+  function rendreStreak() {
+    var row = $('#streak-row');
+    var serie = 0;
+
+    for (var i = historique.length - 1; i >= 0; i--) {
+      if (historique[i].gagne) serie++;
+      else break;
+    }
+
+    var items = historique.map(function (h) {
+      return '<span class="streak__item streak__item--' + (h.gagne ? 'win' : 'lose') + '"' +
+        ' title="' + echapper(h.jour + ' — ' + h.libelle) + '"></span>';
+    });
+
+    items.push('<span class="streak__item streak__item--today' + (guess ? ' is-done' : '') +
+      '" title="Aujourd\'hui"></span>');
+
+    row.innerHTML = items.join('');
+
+    $('#streak-label').innerHTML = guess
+      ? 'Guess enregistré <span class="dot">•</span> série en cours : <b>' + serie + ' jours</b>'
+      : 'Série en cours : <b>' + serie + ' jours</b> <span class="dot">•</span> ne la brisez pas';
+  }
+
+  /* =========================================================
+     Fiche rumeur (sélections additionnelles)
+     ========================================================= */
+  function rendreSheet() {
+    var rumeur = brouillon.rumeur;
+    var sel = brouillon.selections;
+
+    var groupes = rumeur.boosters.map(function (groupe, gi) {
+      var choisi = sel[groupe.id];
+      var options = groupe.options.map(function (opt, oi) {
+        return (
+          '<button class="option' + (choisi === oi ? ' is-selected' : '') + '" type="button"' +
+            ' data-groupe="' + groupe.id + '" data-option="' + oi + '"' +
+            ' aria-pressed="' + (choisi === oi) + '">' +
+            '<span class="option__radio" aria-hidden="true"></span>' +
+            '<span class="option__label">' + echapper(opt.label) + '</span>' +
+            '<span class="option__bonus">+' + opt.bonus + ' €</span>' +
+          '</button>'
+        );
+      }).join('');
+
+      return (
+        '<div class="groupe' + (choisi !== undefined ? ' is-filled' : '') + '">' +
+          '<h3 class="groupe__titre">' +
+            '<span class="groupe__num">' + (choisi !== undefined ? '✓' : gi + 1) + '</span>' +
+            echapper(groupe.titre) +
+          '</h3>' +
+          '<div class="options">' + options + '</div>' +
+        '</div>'
       );
     }).join('');
 
-    slipEmpty.hidden = n > 0;
-    $('#slip-stake').textContent = t.mise + ' €';
-    $('#slip-gain').textContent = euros(t.gain);
-    $('#slip-submit').disabled = n === 0;
-    $('#slip-submit').textContent = n === 0
-      ? 'Parier'
-      : 'Parier ' + t.mise + ' €';
+    sheetScroll.innerHTML =
+      '<div class="sheet__hero" style="--from-color:' + rumeur.clubActuel.couleur + ';--to-color:' + rumeur.clubCible.couleur + '">' +
+        '<h2 class="sheet__joueur" id="sheet-joueur">' + echapper(rumeur.joueur) + ' ' + rumeur.nationalite + '</h2>' +
+        '<p class="sheet__meta">' + echapper(rumeur.poste) + ' <span class="dot">•</span> ' + rumeur.age + ' ans' +
+          ' <span class="dot">•</span> ' + echapper(rumeur.source) + ', ' + echapper(rumeur.tempsSource) + '</p>' +
+        '<div class="sheet__route">' + gabaritRoute(rumeur) +
+          '<span class="rumeur__fee">' + echapper(rumeur.montant) + '</span></div>' +
+      '</div>' +
 
-    // Le combiné exige au moins deux sélections
-    $$('.slip__mode').forEach(function (b) {
-      if (b.dataset.mode === 'combi') b.disabled = n < 2;
-    });
-    if (n < 2 && modeCombi === 'combi') basculerMode('simple');
+      '<div class="sheet__section">' +
+        '<h3 class="sheet__article-titre">' + echapper(rumeur.titre) + '</h3>' +
+        '<p class="sheet__article-texte">' + echapper(rumeur.chapo) + '</p>' +
+      '</div>' +
+
+      '<div class="base">' +
+        '<span class="base__check" aria-hidden="true">✓</span>' +
+        '<span class="base__texte">' +
+          '<span class="base__t">Le transfert est officialisé aujourd\'hui</span>' +
+          '<span class="base__s">Votre guess du jour, acquis par défaut</span>' +
+        '</span>' +
+        '<span class="base__gain"><b>' + rumeur.gainBase + ' €</b></span>' +
+      '</div>' +
+
+      '<div class="boosters">' +
+        '<h3 class="boosters__intro">Boostez vos freebets</h3>' +
+        '<p class="boosters__sub">Chaque sélection ajoutée gonfle la cagnotte. Toutes doivent tomber juste pour être payées.</p>' +
+        groupes +
+      '</div>';
+
+    majTotalSheet(false);
   }
 
-  function basculerMode(mode) {
-    modeCombi = mode;
-    $$('.slip__mode').forEach(function (b) {
-      var actif = b.dataset.mode === mode;
-      b.classList.toggle('is-active', actif);
-      b.setAttribute('aria-selected', String(actif));
-    });
-    majPanier();
+  function majTotalSheet(anime) {
+    var total = calculerGain(brouillon.rumeur, brouillon.selections);
+    var el = $('#sheet-total');
+    el.textContent = total + ' €';
+
+    if (anime) {
+      el.classList.add('is-bumped');
+      setTimeout(function () { el.classList.remove('is-bumped'); }, 250);
+    }
+
+    var nb = Object.keys(brouillon.selections).length;
+    $('#sheet-submit').textContent = guess && guess.rumeurId === brouillon.rumeur.id
+      ? 'Mettre à jour mon guess'
+      : 'Valider mon guess';
+    $('#sheet-hint').textContent = nb === 0
+      ? 'Sans sélection additionnelle, vous jouez le transfert seul.'
+      : nb + (nb > 1 ? ' sélections ajoutées' : ' sélection ajoutée') + ' — toutes doivent être justes.';
   }
 
-  function ouvrirSlip() {
-    slip.classList.add('is-open');
-    slip.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('slip-open');
+  function ouvrirSheet(rumeurId) {
+    var rumeur = trouverRumeur(rumeurId);
+    if (!rumeur) return;
+
+    // Un seul guess par jour : les autres rumeurs sont consultables mais figées.
+    if (guess && guess.rumeurId !== rumeurId) {
+      toast('Un seul guess par jour — revenez demain !');
+      return;
+    }
+
+    brouillon = {
+      rumeur: rumeur,
+      selections: guess && guess.rumeurId === rumeurId
+        ? JSON.parse(JSON.stringify(guess.selections))
+        : {}
+    };
+
+    rendreSheet();
+    sheet.classList.add('is-open');
+    sheet.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('sheet-open');
+    sheetScroll.scrollTop = 0;
   }
 
-  function fermerSlip() {
-    slip.classList.remove('is-open');
-    slip.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('slip-open');
+  function fermerSheet() {
+    sheet.classList.remove('is-open');
+    sheet.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('sheet-open');
+    brouillon = null;
   }
 
   /* =========================================================
-     Compte à rebours
+     Validation
+     ========================================================= */
+  function validerGuess(rumeurId, selections) {
+    var rumeur = trouverRumeur(rumeurId);
+    if (!rumeur) return;
+
+    selections = selections || {};
+    guess = {
+      date: jourISO(),
+      rumeurId: rumeurId,
+      selections: selections,
+      gain: calculerGain(rumeur, selections)
+    };
+    sauver();
+
+    rendreTout();
+    majCompteur();
+
+    toast('Guess validé · ' + guess.gain + ' € de freebets en jeu');
+
+    // On remonte sur le ticket pour matérialiser la validation
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function annulerGuess() {
+    guess = null;
+    sauver();
+    rendreTout();
+    majCompteur();
+    toast('Guess annulé — vous pouvez rejouer aujourd\'hui');
+  }
+
+  function rendreTout() {
+    rendreTicket();
+    rendreFeed();
+    rendreStreak();
+    $('#feed-head').hidden = false;
+  }
+
+  /* =========================================================
+     Compte à rebours jusqu'à la clôture du jour
      ========================================================= */
   function majCompteur() {
-    var reste = new Date(DEADLINE) - new Date();
+    var fin = new Date();
+    fin.setHours(23, 59, 59, 999);
+
+    var reste = fin - new Date();
     var el = $('#countdown-value');
+    var label = $('#countdown-label');
+
+    label.textContent = guess ? 'Résultat dans' : 'Guess ouvert encore';
+
     if (reste <= 0) {
-      el.textContent = 'Mercato fermé';
+      el.textContent = 'Clôturé';
       return;
     }
-    var j = Math.floor(reste / 86400000);
-    var h = Math.floor(reste / 3600000) % 24;
+
+    var h = Math.floor(reste / 3600000);
     var m = Math.floor(reste / 60000) % 60;
     var s = Math.floor(reste / 1000) % 60;
-    el.textContent = j + 'j ' + String(h).padStart(2, '0') + 'h ' +
+    el.textContent = String(h).padStart(2, '0') + 'h ' +
       String(m).padStart(2, '0') + 'm ' + String(s).padStart(2, '0') + 's';
+  }
+
+  function majDate() {
+    var d = new Date();
+    var texte = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    $('#hero-date').textContent = texte.charAt(0).toUpperCase() + texte.slice(1);
   }
 
   /* =========================================================
      Écouteurs
      ========================================================= */
   document.addEventListener('click', function (e) {
-    var btnPick = e.target.closest('.pick__btn, .combi-suggest__btn');
-    if (btnPick) { basculer(btnPick); return; }
+    // Valider directement depuis le bouton jaune de la carte
+    var direct = e.target.closest('[data-valider]');
+    if (direct) { validerGuess(direct.dataset.valider, {}); return; }
 
-    var more = e.target.closest('[data-more]');
-    if (more) {
-      var art = more.closest('.rumeur');
-      var ouvert = art.classList.toggle('is-open');
-      more.textContent = ouvert ? 'Réduire' : 'Lire la suite';
+    // Ouvrir la fiche
+    var ouvrir = e.target.closest('[data-ouvrir]');
+    if (ouvrir) { ouvrirSheet(ouvrir.dataset.ouvrir); return; }
+
+    // Choisir / retirer une sélection additionnelle
+    var option = e.target.closest('.option');
+    if (option && brouillon) {
+      var g = option.dataset.groupe;
+      var o = +option.dataset.option;
+      if (brouillon.selections[g] === o) delete brouillon.selections[g];
+      else brouillon.selections[g] = o;
+
+      // On redessine le groupe concerné sans perdre la position de scroll
+      var pos = sheetScroll.scrollTop;
+      rendreSheet();
+      sheetScroll.scrollTop = pos;
+      majTotalSheet(true);
       return;
     }
 
-    var tab = e.target.closest('.tabs__item[data-filter]');
-    if (tab) {
-      $$('.tabs__item').forEach(function (t) { t.classList.remove('is-active'); });
-      tab.classList.add('is-active');
-      filtreActif = tab.dataset.filter;
-      appliquerFiltre();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (e.target.closest('[data-close-sheet]') || e.target === sheet) { fermerSheet(); return; }
+
+    if (e.target.closest('#sheet-submit') && brouillon) {
+      var r = brouillon.rumeur.id;
+      var s = brouillon.selections;
+      fermerSheet();
+      validerGuess(r, s);
       return;
     }
 
-    if (e.target.closest('[data-open-slip]')) { ouvrirSlip(); return; }
-    if (e.target.closest('[data-close-slip]')) { fermerSlip(); return; }
-    if (e.target === slip) { fermerSlip(); return; }
-
-    var del = e.target.closest('[data-del]');
-    if (del) { retirer(del.dataset.del); return; }
-
-    var mode = e.target.closest('.slip__mode');
-    if (mode && !mode.disabled) { basculerMode(mode.dataset.mode); return; }
-
-    if (e.target.closest('#slip-clear')) {
-      selections = [];
-      sauver();
-      $$('.pick__btn.is-picked, .combi-suggest__btn.is-picked').forEach(function (b) {
-        b.classList.remove('is-picked');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      majPanier();
-      return;
-    }
-
-    if (e.target.closest('#slip-submit')) {
-      var t = totaux();
-      toast('Pari de ' + t.mise + ' € enregistré · gain potentiel ' + euros(t.gain));
-      selections = [];
-      sauver();
-      $$('.pick__btn.is-picked, .combi-suggest__btn.is-picked').forEach(function (b) {
-        b.classList.remove('is-picked');
-        b.setAttribute('aria-pressed', 'false');
-      });
-      majPanier();
-      fermerSlip();
-    }
+    if (e.target.closest('#ticket-cancel')) { annulerGuess(); }
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') fermerSlip();
+    if (e.key === 'Escape') fermerSheet();
   });
 
   /* =========================================================
      Démarrage
      ========================================================= */
-  rendre();
-  majPanier();
+  guess = charger();
+  majDate();
+  rendreTout();
   majCompteur();
   setInterval(majCompteur, 1000);
 })();
