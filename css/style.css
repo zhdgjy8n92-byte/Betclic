@@ -126,81 +126,10 @@ h1, h2, h3 { margin: 0; }
 .dot { color: var(--text-mute); }
 
 /* =========================================================
-   HEADER
+   PASTILLE FEEBET
+   Le bandeau supérieur a été retiré : seules subsistent les règles
+   servant aux totaux de la fiche, de la modale et du ticket.
    ========================================================= */
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background: rgba(10, 14, 28, .92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line);
-}
-
-.topbar__inner {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 10px var(--pad);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: inherit;
-  min-width: 0;
-}
-
-/* Logo de l'opération, généré en SVG depuis les polices Betclic
-   (voir tools/make-logo.py). Deux déclinaisons : compacte pour le
-   header, empilée pour la une. */
-/* Le lock-up horizontal est très allongé (≈ 10:1) : on le contraint en
-   largeur, sinon il chasse le portefeuille hors de l'écran. */
-.brand__logo {
-  display: block;
-  width: min(50vw, 232px);
-  height: auto;
-}
-
-.hero__logo-img {
-  display: block;
-  margin: 0 auto;
-  width: min(78%, 340px);
-  height: auto;
-}
-
-.wallet {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.wallet__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--card-2);
-  border-radius: 999px;
-  padding: 4px 11px 4px 4px;
-  font-weight: 700;
-  font-size: 13px;
-  white-space: nowrap;
-  transition: transform .3s ease;
-}
-
-.wallet__chip.is-bumped { transform: scale(1.14); }
-
-/* Pastille Feebet (assets/img/feebet.svg) */
-.wallet__icon {
-  display: block;
-  width: 21px; height: 21px;
-  flex: 0 0 auto;
-}
-
 .total-wrap {
   display: inline-flex;
   align-items: center;
@@ -211,36 +140,6 @@ h1, h2, h3 { margin: 0; }
   display: block;
   flex: 0 0 auto;
   filter: drop-shadow(0 2px 5px rgba(238, 75, 38, .45));
-}
-
-.wallet__avatar {
-  border: 0;
-  background: linear-gradient(160deg, #3A4568, #2A3350);
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 16px;
-  position: relative;
-  padding: 0;
-}
-
-.wallet__badge {
-  position: absolute;
-  top: -3px; right: -3px;
-  background: #fff;
-  color: #0A0E1C;
-  font-size: 10px;
-  font-weight: 700;
-  min-width: 16px; height: 16px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  padding: 0 3px;
-}
-
-@media (max-width: 380px) {
-  .brand__logo { width: min(46vw, 180px); }
 }
 
 /* =========================================================
@@ -287,6 +186,13 @@ h1, h2, h3 { margin: 0; }
 }
 
 .hero__logo { margin: 4px 0 12px; }
+
+.hero__logo-img {
+  display: block;
+  margin: 0 auto;
+  width: min(80%, 360px);
+  height: auto;
+}
 
 .hero__title {
   margin: 0 0 8px;
