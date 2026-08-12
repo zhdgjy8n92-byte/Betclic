@@ -80,6 +80,37 @@ le disque, et se dépose tel quel sur n'importe quel hébergeur statique :
 glissez-le sur [Netlify Drop](https://app.netlify.com/drop) pour obtenir une URL
 publique en quelques secondes, sans compte ni ligne de commande.
 
+### Protection par mot de passe
+
+```bash
+pip install pycryptodome
+python3 tools/build-protected.py 'le-mot-de-passe'
+# → public/index.html
+```
+
+Le contenu n'est pas masqué, il est **chiffré** : AES-256-GCM, clé dérivée du
+mot de passe par PBKDF2-HMAC-SHA256 sur 250 000 itérations. La page publiée ne
+contient que le chiffré, le sel et l'IV — sans le mot de passe, le site n'est
+pas récupérable depuis le code source. Le script échoue si un témoin du contenu
+en clair se retrouve dans la sortie, et le workflow refuse de déployer dans ce
+cas.
+
+Le mot de passe n'est écrit ni dans le fichier produit, ni dans le dépôt : il se
+passe en argument ou via `MERCATODDS_PASSWORD`. Pour le changer, relancer la
+commande et repousser `public/index.html`.
+
+Une session déverrouillée est mémorisée dans `sessionStorage` : le mot de passe
+n'est pas redemandé à chaque visite, mais il l'est à la réouverture du
+navigateur.
+
+> **Portée réelle de la protection.** Elle ne vaut que pour le site publié. Tant
+> que le dépôt est public, les sources en clair (`index.html`, `css/`, `js/`,
+> `data/`) restent lisibles sur GitHub, et l'adresse du dépôt se déduit de celle
+> du site. Pour que le mot de passe protège vraiment, il faut soit passer le
+> dépôt en privé — ce qui coupe Pages sur un compte gratuit — soit héberger
+> `public/index.html` ailleurs, par exemple sur Netlify Drop, en gardant le
+> dépôt privé.
+
 ### GitHub Pages
 
 Le workflow `.github/workflows/pages.yml` déploie la racine du dépôt à chaque
