@@ -4,16 +4,17 @@ Déposez ici les photos, nommées exactement ainsi :
 
 ```
 ferran-torres.png
-rodri.png<img width="960" height="1441" alt="ferran-torres" src="https://github.com/user-attachments/assets/0972047f-6fe6-40e7-8340-0d17d98f6b48" />
-<img width="960" height="1440" alt="rodri" src="https://github.com/user-attachments/assets/e6c6dcbd-9b29-46b8-9e6b-72f3a7063873" />
-<img width="429" height="466" alt="bouaddi" src="https://github.com/user-attachments/assets/6ca538c6-7b4a-4244-9e1c-7e2139804290" />
-<img width="250" height="375" alt="alvarez" src="https://github.com/user-attachments/assets/b7929b7c-31f6-43f1-bced-d6d18363f539" />
-<img width="294" height="440" alt="barcola" src="https://github.com/user-attachments/assets/892e1378-7931-42b0-9b9f-b5da020a6a85" />
-
+rodri.png
 bouaddi.png
 barcola.png
 alvarez.png
 ```
+
+> **Comment les déposer.** Utiliser l'écran **Add file › Upload files** du
+> dépôt, celui qui affiche une zone pointillée « Drag files here ». Ne pas
+> coller les images dans l'éditeur de texte d'un fichier : GitHub les
+> transforme alors en pièces jointes de commentaire, et aucun fichier n'entre
+> réellement dans le dépôt.
 
 Elles s'affichent alors automatiquement dans la pastille de chaque carte et en
 tête de la fiche. Tant qu'un fichier est absent, les initiales du joueur
