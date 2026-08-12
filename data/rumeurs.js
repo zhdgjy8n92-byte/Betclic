@@ -20,7 +20,7 @@
 window.MERCATODDS_RUMEURS = [
   {
     id: 'ferran-psg',
-    photo: 'assets/img/joueurs/ferran-torres.png',
+    photo: 'assets/img/joueurs/ferran-torres.jpg',
     joueur: 'Ferran Torres',
     initiales: 'FT',
     poste: 'Attaquant',
@@ -78,7 +78,7 @@ window.MERCATODDS_RUMEURS = [
   },
   {
     id: 'rodri-barca',
-    photo: 'assets/img/joueurs/rodri.png',
+    photo: 'assets/img/joueurs/rodri.jpg',
     joueur: 'Rodri',
     initiales: 'RH',
     poste: 'Milieu défensif',
@@ -128,7 +128,7 @@ window.MERCATODDS_RUMEURS = [
   },
   {
     id: 'bouaddi-city',
-    photo: 'assets/img/joueurs/bouaddi.png',
+    photo: 'assets/img/joueurs/bouaddi.jpg',
     joueur: 'Ayyoub Bouaddi',
     initiales: 'AB',
     poste: 'Milieu',
@@ -178,7 +178,7 @@ window.MERCATODDS_RUMEURS = [
   },
   {
     id: 'barcola-liverpool',
-    photo: 'assets/img/joueurs/barcola.png',
+    photo: 'assets/img/joueurs/barcola.jpg',
     joueur: 'Bradley Barcola',
     initiales: 'BB',
     poste: 'Ailier',
@@ -228,7 +228,7 @@ window.MERCATODDS_RUMEURS = [
   },
   {
     id: 'alvarez-barca',
-    photo: 'assets/img/joueurs/alvarez.png',
+    photo: 'assets/img/joueurs/alvarez.jpg',
     joueur: 'Julián Álvarez',
     initiales: 'JA',
     poste: 'Attaquant',
