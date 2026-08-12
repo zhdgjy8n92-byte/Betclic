@@ -1,11 +1,16 @@
 """
-Génère le logo Mercat'odds en SVG à partir des polices Betclic fournies.
+Génère les logos du Mercat'odds en SVG à partir des polices Betclic fournies :
 
-Les glyphes sont convertis en tracés vectoriels : le SVG ne dépend d'aucune
-police et se comporte comme une image classique.
+  logo-mercatodds.svg          lock-up vertical de l'opération
+  logo-mercatodds-inline.svg   version compacte pour le header
+  feebet.svg                   pastille Feebet (disque orange, F blanc)
+
+Les glyphes sont convertis en tracés vectoriels : les SVG ne dépendent d'aucune
+police et se comportent comme des images classiques.
 """
 from fontTools.ttLib import TTFont
 from fontTools.pens.svgPathPen import SVGPathPen
+from fontTools.pens.boundsPen import BoundsPen
 
 FONTS = {
     'bold': '/home/user/Betclic/assets/fonts/BetclicBold.ttf',
@@ -137,10 +142,55 @@ def build(stacked=True):
     return '\n'.join(svg)
 
 
+def build_feebet():
+    """Pastille Feebet : anneau blanc, disque orange, F blanc centré."""
+    ORANGE = '#EE4B26'
+    size = 100.0
+    cx = cy = size / 2
+
+    font = TTFont(FONTS['bold'])
+    upem = font['head'].unitsPerEm
+    name = font.getBestCmap()[ord('F')]
+    glyphset = font.getGlyphSet()
+
+    pen = SVGPathPen(glyphset)
+    glyphset[name].draw(pen)
+    d = pen.getCommands()
+
+    bounds = BoundsPen(glyphset)
+    glyphset[name].draw(bounds)
+    x_min, y_min, x_max, y_max = bounds.bounds
+    font.close()
+
+    # Le F occupe 52 % du diamètre, centré sur sa boîte englobante réelle
+    scale = (size * 0.52) / (y_max - y_min)
+    w = (x_max - x_min) * scale
+    h = (y_max - y_min) * scale
+    tx = cx - w / 2 - x_min * scale
+    ty = cy + h / 2 + y_min * scale
+
+    return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %g %g" '
+        'width="%g" height="%g" role="img" aria-label="Feebet">'
+        '<title>Feebet</title>'
+        '<circle cx="%g" cy="%g" r="%g" fill="#FFFFFF"/>'
+        '<circle cx="%g" cy="%g" r="%g" fill="%s"/>'
+        '<path fill="#FFFFFF" transform="translate(%.3f %.3f) scale(%.6f -%.6f)" d="%s"/>'
+        '</svg>'
+        % (size, size, size, size,
+           cx, cy, size / 2,
+           cx, cy, size * 0.445, ORANGE,
+           tx, ty, scale, scale, d)
+    )
+
+
 with open('/home/user/Betclic/assets/img/logo-mercatodds.svg', 'w') as f:
     f.write(build(stacked=True))
 
 with open('/home/user/Betclic/assets/img/logo-mercatodds-inline.svg', 'w') as f:
     f.write(build(stacked=False))
+
+with open('/home/user/Betclic/assets/img/feebet.svg', 'w') as f:
+    f.write(build_feebet())
 
 print('SVG générés')

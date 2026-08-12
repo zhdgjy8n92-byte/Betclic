@@ -192,16 +192,23 @@ h1, h2, h3 { margin: 0; }
 
 .wallet__chip.is-bumped { transform: scale(1.14); }
 
+/* Pastille Feebet (assets/img/feebet.svg) */
 .wallet__icon {
-  width: 19px; height: 19px;
-  border-radius: 50%;
-  background: var(--red);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  display: grid;
-  place-items: center;
-  font-style: italic;
+  display: block;
+  width: 21px; height: 21px;
+  flex: 0 0 auto;
+}
+
+.total-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.feebet-ico {
+  display: block;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 2px 5px rgba(238, 75, 38, .45));
 }
 
 .wallet__avatar {
@@ -820,7 +827,7 @@ h1, h2, h3 { margin: 0; }
 
 .modal__plus { width: 20px; height: 20px; font-size: 14px; }
 
-/* Le bouton jaune : la mise en freebets, jamais une cote */
+/* Le bouton jaune : la mise en feebets, jamais une cote */
 .cta__go {
   position: relative;
   overflow: hidden;

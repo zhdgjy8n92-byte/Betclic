@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Betclic Mercat'odds — Le guess du jour</title>
-<meta name="description" content="Betclic Mercat'odds : un guess par jour. Devinez le transfert qui sera officialisé aujourd'hui et gagnez des freebets.">
+<meta name="description" content="Betclic Mercat'odds : un guess par jour. Devinez le transfert qui sera officialisé aujourd'hui et gagnez des feebets.">
 <meta name="theme-color" content="#0A0E1C">
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23E30613'/><text x='16' y='23' font-family='Arial' font-size='20' font-weight='bold' font-style='italic' fill='white' text-anchor='middle'>B</text></svg>">
@@ -20,8 +20,9 @@
     </a>
 
     <div class="wallet">
-      <span class="wallet__chip wallet__chip--freebet">
-        <span class="wallet__icon" aria-hidden="true">F</span><span id="wallet-freebets">51 €</span>
+      <span class="wallet__chip wallet__chip--feebet">
+        <img class="wallet__icon" src="assets/img/feebet.svg" alt="Feebets"
+             width="20" height="20"><span id="wallet-feebets">51 €</span>
       </span>
       <button class="wallet__avatar" type="button" aria-label="Mon compte">
         <span aria-hidden="true">👤</span>
@@ -48,7 +49,7 @@
     <p class="hero__title">Le guess du jour</p>
     <p class="hero__baseline">
       Un seul pronostic par jour. Désigne le transfert qui sera
-      <strong>officialisé aujourd'hui</strong> et repars avec des freebets.
+      <strong>officialisé aujourd'hui</strong> et repars avec des feebets.
     </p>
 
     <div class="streak">
@@ -69,7 +70,7 @@
 <!-- ============ FEED ============ -->
 <div class="feed-head" id="feed-head">
   <h2 class="feed-head__title">Les rumeurs du jour</h2>
-  <p class="feed-head__sub">Touche le montant pour poser ton guess, ou ouvre une rumeur pour booster tes freebets.</p>
+  <p class="feed-head__sub">Touche le montant pour poser ton guess, ou ouvre une rumeur pour booster tes feebets.</p>
 </div>
 
 <main class="feed" id="feed"></main>
@@ -93,8 +94,11 @@
     <div class="sheet__scroll" id="sheet-scroll"></div>
     <div class="sheet__foot">
       <div class="sheet__total">
-        <span class="sheet__total-label">Freebets à gagner</span>
-        <strong class="sheet__total-value" id="sheet-total">5 €</strong>
+        <span class="sheet__total-label">Feebets à gagner</span>
+        <span class="total-wrap">
+          <img class="feebet-ico" src="assets/img/feebet.svg" alt="" width="26" height="26">
+          <strong class="sheet__total-value" id="sheet-total">5 €</strong>
+        </span>
       </div>
       <button class="sheet__submit" type="button" id="sheet-submit">Valider mon guess</button>
       <p class="sheet__hint" id="sheet-hint">Chaque sélection ajoutée augmente la cagnotte, mais doit être juste pour être payée.</p>
@@ -109,8 +113,11 @@
     <p class="modal__texte" id="modal-texte"></p>
 
     <div class="modal__gain">
-      <span class="modal__gain-label">Freebets à gagner</span>
-      <strong class="modal__gain-value" id="modal-gain">5 €</strong>
+      <span class="modal__gain-label">Feebets à gagner</span>
+      <span class="total-wrap">
+        <img class="feebet-ico" src="assets/img/feebet.svg" alt="" width="24" height="24">
+        <strong class="modal__gain-value" id="modal-gain">5 €</strong>
+      </span>
     </div>
 
     <button class="modal__primary" type="button" id="modal-valider">Valider mon guess</button>

@@ -2,7 +2,7 @@
 
 Site de démonstration bâti autour d'un **guess quotidien** sur le mercato.
 Chaque jour, le joueur désigne le transfert qu'il pense voir officialisé dans la
-journée. Si ça tombe, il empoche des **freebets**. Il peut gonfler la cagnotte en
+journée. Si ça tombe, il empoche des **feebets**. Il peut gonfler la cagnotte en
 ouvrant la rumeur et en ajoutant des sélections complémentaires.
 
 ## La mécanique
@@ -23,7 +23,7 @@ ouvrant la rumeur et en ajoutant des sélections complémentaires.
 6. **Série.** Les losanges sous le titre rappellent les résultats des derniers
    jours, dans l'esprit des indicateurs de forme de l'app.
 
-Aucune cote n'est affichée nulle part : tout est exprimé en euros de freebets.
+Aucune cote n'est affichée nulle part : tout est exprimé en euros de feebets.
 Le joueur est tutoyé partout.
 
 ## Cohérence des montants
@@ -128,7 +128,7 @@ Ajouter une entrée dans `data/rumeurs.js` :
   clubActuel: { nom: '…', couleur: '#…' },   // couleur = dégradé du bandeau
   clubCible:  { nom: '…', couleur: '#…' },
   fiabilite: 70,                              // jauge, en %
-  gainBase: 5,                                // freebets du guess seul
+  gainBase: 5,                                // feebets du guess seul
   boosters: [                                 // sélections additionnelles
     { id: 'club', titre: '…', options: [{ label: '…', bonus: 8 }] }
   ]

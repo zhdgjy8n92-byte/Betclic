@@ -2,10 +2,10 @@
  * Base de données du Mercat'odds.
  *
  * Mécanique : un seul guess par jour. Le joueur désigne le transfert qu'il
- * pense voir officialisé dans la journée et empoche `gainBase` en freebets si
+ * pense voir officialisé dans la journée et empoche `gainBase` en feebets si
  * ça tombe. Il peut gonfler cette cagnotte en ajoutant des sélections
  * complémentaires (club d'arrivée, heure d'officialisation, montant…), chacune
- * valant le `bonus` en freebets indiqué sur la puce.
+ * valant le `bonus` en feebets indiqué sur la puce.
  *
  * Cohérence des montants : le gain est l'inverse de la probabilité. Un dossier
  * quasiment bouclé rapporte peu (5 €), un dossier enlisé rapporte gros (40 €).
@@ -15,7 +15,7 @@
  * Les rumeurs sont classées par fiabilité décroissante et les statuts reflètent
  * l'état réel des dossiers au 12 août 2026 (voir README pour les sources).
  *
- * Aucune cote n'est affichée nulle part : tout est exprimé en euros de freebets.
+ * Aucune cote n'est affichée nulle part : tout est exprimé en euros de feebets.
  */
 window.MERCATODDS_RUMEURS = [
   {

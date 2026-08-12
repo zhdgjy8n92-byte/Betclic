@@ -3,10 +3,10 @@
    ---------------------------------------------------------
    Un seul guess par jour. Le joueur désigne le transfert qu'il
    pense voir officialisé dans la journée : s'il tombe juste, il
-   empoche des freebets. Il peut gonfler la cagnotte en ajoutant
+   empoche des feebets. Il peut gonfler la cagnotte en ajoutant
    des sélections complémentaires depuis la fiche de la rumeur.
 
-   Aucune cote n'est affichée : tout est exprimé en euros de freebets.
+   Aucune cote n'est affichée : tout est exprimé en euros de feebets.
    ========================================================= */
 (function () {
   'use strict';
@@ -250,8 +250,11 @@
             }).join('') +
           '</ul>' +
           '<div class="ticket__total">' +
-            '<span class="ticket__total-label">Freebets à gagner</span>' +
-            '<span class="ticket__total-value">' + guess.gain + ' €</span>' +
+            '<span class="ticket__total-label">Feebets à gagner</span>' +
+            '<span class="total-wrap">' +
+              '<img class="feebet-ico" src="assets/img/feebet.svg" alt="" width="26" height="26">' +
+              '<span class="ticket__total-value">' + guess.gain + ' €</span>' +
+            '</span>' +
           '</div>' +
           '<div class="ticket__actions">' +
             '<button class="ticket__edit" type="button" data-ouvrir="' + rumeur.id + '">Modifier</button>' +
@@ -346,7 +349,7 @@
       '</div>' +
 
       '<div class="boosters">' +
-        '<h3 class="boosters__intro">Booste tes freebets</h3>' +
+        '<h3 class="boosters__intro">Booste tes feebets</h3>' +
         '<p class="boosters__sub">Chaque sélection ajoutée gonfle la cagnotte. Toutes doivent tomber juste pour être payées.</p>' +
         groupes +
       '</div>';
@@ -455,7 +458,7 @@
     rendreTout();
     majCompteur();
 
-    toast('Guess validé · ' + guess.gain + ' € de freebets en jeu');
+    toast('Guess validé · ' + guess.gain + ' € de feebets en jeu');
 
     // On remonte sur le ticket pour matérialiser la validation
     window.scrollTo({ top: 0, behavior: 'smooth' });
