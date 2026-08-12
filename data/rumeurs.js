@@ -278,6 +278,39 @@ window.MERCATODDS_RUMEURS = [
   }
 ];
 
+/**
+ * Règles de dénouement, affichées derrière le « ? » de chaque marché.
+ *
+ * Principe commun : seule fait foi la communication officielle des clubs.
+ * Les annonces de journalistes, même fiables, ne dénouent pas un pari.
+ * Une clé correspond à l'`id` d'un groupe de sélections ; `base` couvre le
+ * prono du jour lui-même.
+ */
+window.MERCATODDS_AIDES = {
+  base:
+    "Le transfert est réputé officialisé dès qu'un des deux clubs publie son " +
+    "communiqué officiel, avant minuit (heure de Paris). Les annonces de " +
+    "journalistes, même confirmées ensuite, ne suffisent pas.",
+
+  club:
+    "Le club retenu est celui qui publie le communiqué d'arrivée. Un prêt " +
+    "compte comme une signature dans le club qui accueille le joueur.",
+
+  heure:
+    "L'heure retenue est celle de publication du communiqué officiel, en heure " +
+    "de Paris. Si les deux clubs communiquent, c'est le premier des deux qui " +
+    "fait foi.",
+
+  montant:
+    "Le montant retenu est celui annoncé dans le communiqué officiel, hors " +
+    "bonus et intéressement à la revente. Si aucun montant n'est communiqué, " +
+    "la sélection est remboursée.",
+
+  formule:
+    "La forme retenue est celle décrite par le communiqué officiel : transfert " +
+    "définitif, ou prêt — avec ou sans option d'achat."
+};
+
 /** Historique des derniers jours, pour la série affichée en une. */
 window.MERCATODDS_HISTORIQUE = [
   { jour: 'Ven', gagne: true,  libelle: 'Wirtz à Leverkusen' },

@@ -15,6 +15,7 @@
 
   var rumeurs = window.MERCATODDS_RUMEURS || [];
   var historique = window.MERCATODDS_HISTORIQUE || [];
+  var aides = window.MERCATODDS_AIDES || {};
 
   /* ---------- État ---------- */
   var prono = null;      // prono validé du jour
@@ -119,6 +120,39 @@
     if (v >= 70) return '';
     if (v >= 45) return ' fiab__fill--mid';
     return ' fiab__fill--low';
+  }
+
+  /* =========================================================
+     Règles de dénouement
+     ---------------------------------------------------------
+     Chaque marché porte un « ? » qui déplie la règle : ce qui fait foi,
+     c'est le communiqué officiel du club, et l'heure de sa publication.
+     ========================================================= */
+  function texteAide(cle, surcharge) {
+    return surcharge || aides[cle] || '';
+  }
+
+  function gabaritAide(cle, surcharge) {
+    if (!texteAide(cle, surcharge)) return '';
+    var ouvert = brouillon && brouillon.aides[cle];
+    return (
+      '<button class="aide__bouton' + (ouvert ? ' is-open' : '') + '" type="button"' +
+        ' data-aide="' + cle + '"' +
+        ' aria-expanded="' + (ouvert ? 'true' : 'false') + '"' +
+        ' aria-label="Comment ce pari est-il dénoué ?">?</button>'
+    );
+  }
+
+  function gabaritPanneauAide(cle, surcharge) {
+    var texte = texteAide(cle, surcharge);
+    if (!texte) return '';
+    var ouvert = brouillon && brouillon.aides[cle];
+    return (
+      '<p class="aide__panneau' + (ouvert ? ' is-open' : '') + '"' +
+        ' data-panneau="' + cle + '"' + (ouvert ? '' : ' hidden') + '>' +
+        echapper(texte) +
+      '</p>'
+    );
   }
 
   /**
@@ -351,8 +385,10 @@
         '<div class="groupe' + (choisi !== undefined ? ' is-filled' : '') + '">' +
           '<h3 class="groupe__titre">' +
             '<span class="groupe__num">' + (choisi !== undefined ? '✓' : gi + 1) + '</span>' +
-            echapper(groupe.titre) +
+            '<span class="groupe__libelle">' + echapper(groupe.titre) + '</span>' +
+            gabaritAide(groupe.id, groupe.aide) +
           '</h3>' +
+          gabaritPanneauAide(groupe.id, groupe.aide) +
           '<div class="options">' + options + '</div>' +
         '</div>'
       );
@@ -373,13 +409,17 @@
         '<p class="sheet__article-texte">' + echapper(rumeur.chapo) + '</p>' +
       '</div>' +
 
-      '<div class="base">' +
-        '<span class="base__check" aria-hidden="true">✓</span>' +
-        '<span class="base__texte">' +
-          '<span class="base__t">Le transfert est officialisé aujourd\'hui</span>' +
-          '<span class="base__s">Ton prono du jour, acquis par défaut</span>' +
-        '</span>' +
-        '<span class="base__gain"><b>' + rumeur.gainBase + ' €</b></span>' +
+      '<div class="base-bloc">' +
+        '<div class="base">' +
+          '<span class="base__check" aria-hidden="true">✓</span>' +
+          '<span class="base__texte">' +
+            '<span class="base__t">Le transfert est officialisé aujourd\'hui' +
+              gabaritAide('base') + '</span>' +
+            '<span class="base__s">Ton prono du jour, acquis par défaut</span>' +
+          '</span>' +
+          '<span class="base__gain"><b>' + rumeur.gainBase + ' €</b></span>' +
+        '</div>' +
+        gabaritPanneauAide('base') +
       '</div>' +
 
       '<div class="boosters">' +
@@ -424,7 +464,8 @@
       rumeur: rumeur,
       selections: prono && prono.rumeurId === rumeurId
         ? JSON.parse(JSON.stringify(prono.selections))
-        : {}
+        : {},
+      aides: {}   // panneaux d'aide dépliés, conservés entre deux rendus
     };
 
     rendreSheet();
@@ -573,6 +614,22 @@
     // Ouvrir la fiche
     var ouvrir = e.target.closest('[data-ouvrir]');
     if (ouvrir) { ouvrirSheet(ouvrir.dataset.ouvrir); return; }
+
+    // Déplier ou replier une règle de dénouement
+    var aide = e.target.closest('[data-aide]');
+    if (aide && brouillon) {
+      var cle = aide.dataset.aide;
+      var panneau = document.querySelector('[data-panneau="' + cle + '"]');
+      var ouvert = !brouillon.aides[cle];
+      brouillon.aides[cle] = ouvert;
+      aide.classList.toggle('is-open', ouvert);
+      aide.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+      if (panneau) {
+        panneau.hidden = !ouvert;
+        panneau.classList.toggle('is-open', ouvert);
+      }
+      return;
+    }
 
     // Choisir / retirer une sélection additionnelle
     var option = e.target.closest('.option');

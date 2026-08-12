@@ -1039,6 +1039,63 @@ h1, h2, h3 { margin: 0; }
   margin-bottom: 9px;
 }
 
+.groupe__libelle { min-width: 0; }
+
+/* =========================================================
+   RÈGLE DE DÉNOUEMENT
+   Le « ? » de chaque marché déplie la règle qui le tranche.
+   ========================================================= */
+.aide__bouton {
+  flex: 0 0 auto;
+  width: 19px; height: 19px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--text-mute);
+  background: rgba(255, 255, 255, .05);
+  color: var(--text-dim);
+  font-family: 'Betclic', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-grid;
+  place-items: center;
+  transition: transform .2s ease, background .2s ease,
+              border-color .2s ease, color .2s ease;
+}
+
+.aide__bouton.is-open {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #06121C;
+}
+
+/* Sur le pari de base, le « ? » suit le texte plutôt que le titre */
+.base__t .aide__bouton {
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.aide__panneau {
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-dim);
+  background: rgba(20, 214, 166, .07);
+  border: 1px solid rgba(20, 214, 166, .28);
+  border-left-width: 3px;
+  border-radius: 10px;
+  animation: aide-depli .22s cubic-bezier(.2, .8, .3, 1);
+}
+
+/* Dans le bloc du pari de base, le panneau prolonge la carte turquoise */
+.base-bloc .aide__panneau { margin: 8px 16px 0; }
+
+@keyframes aide-depli {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .groupe__num {
   width: 20px; height: 20px;
   border-radius: 50%;
@@ -1547,6 +1604,20 @@ h1, h2, h3 { margin: 0; }
 
   .modal__cancel { transition: color .2s ease; }
   .modal__cancel:hover { color: var(--text-dim); }
+
+  /* --- Le « ? » des règles --- */
+  .aide__bouton:hover {
+    background: rgba(255, 255, 255, .14);
+    border-color: var(--teal);
+    color: #fff;
+    transform: scale(1.15);
+  }
+
+  .aide__bouton.is-open:hover {
+    background: var(--teal);
+    color: #06121C;
+    transform: scale(1.15);
+  }
 
   /* --- Ticket --- */
   .ticket__edit,
