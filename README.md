@@ -1,24 +1,24 @@
 # Betclic Mercat'odds
 
-Site de démonstration bâti autour d'un **guess quotidien** sur le mercato.
+Site de démonstration bâti autour d'un **prono quotidien** sur le mercato.
 Chaque jour, le joueur désigne le transfert qu'il pense voir officialisé dans la
 journée. Si ça tombe, il empoche des **feebets**. Il peut gonfler la cagnotte en
 ouvrant la rumeur et en ajoutant des sélections complémentaires.
 
 ## La mécanique
 
-1. **Un guess par jour.** Le fil présente les rumeurs du jour, classées par
-   fiabilité décroissante. Le bouton jaune porte le gain du guess seul.
+1. **Un prono par jour.** Le fil présente les rumeurs du jour, classées par
+   fiabilité décroissante. Le bouton jaune porte le gain du prono seul.
 2. **Confirmation.** Ce bouton ne valide pas d'emblée : une modale demande si le
-   joueur confirme en l'état ou s'il préfère enrichir son guess.
+   joueur confirme en l'état ou s'il préfère enrichir son prono.
 3. **Booster la cagnotte.** La fiche de la rumeur donne accès aux sélections
    additionnelles — club d'arrivée, tranche horaire de l'officialisation,
    tranche de montant, forme du transfert. Chaque option affiche ce qu'elle
    rapporte en plus (`+7 €`, `+14 €`…) et le total se recalcule en direct.
 4. **Tout ou rien.** Les sélections ajoutées doivent toutes être justes pour que
    la cagnotte soit payée.
-5. **Verrouillage.** Une fois le guess validé, les autres rumeurs passent en
-   grisé : un seul guess par jour. Le guess reste modifiable ou annulable
+5. **Verrouillage.** Une fois le prono validé, les autres rumeurs passent en
+   grisé : un seul prono par jour. Le prono reste modifiable ou annulable
    jusqu'à minuit.
 6. **Série.** Les losanges sous le titre rappellent les résultats des derniers
    jours, dans l'esprit des indicateurs de forme de l'app.
@@ -35,7 +35,7 @@ attendue vaut quelques euros et l'issue improbable plusieurs dizaines.
 
 Les fiabilités reflètent l'état réel des dossiers au 12 août 2026 :
 
-| Rumeur | Statut | Fiabilité | Guess seul |
+| Rumeur | Statut | Fiabilité | Prono seul |
 |---|---|---|---|
 | Ferran Torres → PSG | Accord imminent, joueur d'accord, ~50 M€ | 88 % | 5 € |
 | Rodri → Barça | Accord bouclé à 50 M€, arrivée attendue le 12 | 85 % | 5 € |
@@ -136,7 +136,7 @@ attribuées à de vrais médias.
 ```
 index.html            coquille de la page
 css/style.css         DA Betclic (tokens, logo, cartes, fiche, boosters)
-js/app.js             fil, fiche rumeur, guess du jour, ticket, compte à rebours
+js/app.js             fil, fiche rumeur, prono du jour, ticket, compte à rebours
 data/rumeurs.js       rumeurs, sélections additionnelles et historique
 assets/fonts/         Betclic Regular / Bold / Condensed Bold
 ```
@@ -193,7 +193,7 @@ Ajouter une entrée dans `data/rumeurs.js` :
   clubActuel: { nom: '…', couleur: '#…' },   // couleur = dégradé du bandeau
   clubCible:  { nom: '…', couleur: '#…' },
   fiabilite: 70,                              // jauge, en %
-  gainBase: 5,                                // feebets du guess seul
+  gainBase: 5,                                // feebets du prono seul
   boosters: [                                 // sélections additionnelles
     { id: 'club', titre: '…', options: [{ label: '…', bonus: 8 }] }
   ]

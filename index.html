@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Betclic Mercat'odds — Le guess du jour</title>
-<meta name="description" content="Betclic Mercat'odds : un guess par jour. Devinez le transfert qui sera officialisé aujourd'hui et gagnez des feebets.">
+<title>Betclic Mercat'odds — Le prono du jour</title>
+<meta name="description" content="Betclic Mercat'odds : un prono par jour. Devinez le transfert qui sera officialisé aujourd'hui et gagnez des feebets.">
 <meta name="theme-color" content="#0A0E1C">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="css/style.css">
@@ -47,7 +47,7 @@
            alt="Betclic Mercat'odds" width="2786" height="700">
     </h1>
 
-    <p class="hero__title">Le guess du jour</p>
+    <p class="hero__title">Le prono du jour</p>
     <p class="hero__baseline">
       Un seul pronostic par jour. Désigne le transfert qui sera
       <strong>officialisé aujourd'hui</strong> et repars avec des feebets.
@@ -59,19 +59,19 @@
     </div>
 
     <div class="hero__countdown">
-      <span class="hero__countdown-label" id="countdown-label">Guess ouvert encore</span>
+      <span class="hero__countdown-label" id="countdown-label">Prono ouvert encore</span>
       <span class="hero__countdown-value" id="countdown-value">—</span>
     </div>
   </div>
 </section>
 
-<!-- ============ GUESS VALIDÉ ============ -->
+<!-- ============ PRONO VALIDÉ ============ -->
 <section class="ticket" id="ticket" hidden aria-live="polite"></section>
 
 <!-- ============ FEED ============ -->
 <div class="feed-head" id="feed-head">
   <h2 class="feed-head__title">Les rumeurs du jour</h2>
-  <p class="feed-head__sub">Touche le montant pour poser ton guess, ou ouvre une rumeur pour booster tes feebets.</p>
+  <p class="feed-head__sub">Touche une rumeur pour poser ton prono du jour.</p>
 </div>
 
 <main class="feed" id="feed"></main>
@@ -101,16 +101,16 @@
           <strong class="sheet__total-value" id="sheet-total">5 €</strong>
         </span>
       </div>
-      <button class="sheet__submit" type="button" id="sheet-submit">Valider mon guess</button>
+      <button class="sheet__submit" type="button" id="sheet-submit">Valider mon prono</button>
       <p class="sheet__hint" id="sheet-hint">Chaque sélection ajoutée augmente la cagnotte, mais doit être juste pour être payée.</p>
     </div>
   </div>
 </aside>
 
-<!-- ============ CONFIRMATION DU GUESS ============ -->
+<!-- ============ CONFIRMATION DU PRONO ============ -->
 <div class="modal" id="modal" aria-hidden="true">
   <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-titre">
-    <h2 class="modal__titre" id="modal-titre">Tu valides ce guess ?</h2>
+    <h2 class="modal__titre" id="modal-titre">Tu valides ce prono ?</h2>
     <p class="modal__texte" id="modal-texte"></p>
 
     <div class="modal__gain">
@@ -121,7 +121,7 @@
       </span>
     </div>
 
-    <button class="modal__primary" type="button" id="modal-valider">Valider mon guess</button>
+    <button class="modal__primary" type="button" id="modal-valider">Valider mon prono</button>
     <button class="modal__secondary" type="button" id="modal-booster">
       <span class="modal__plus" aria-hidden="true">+</span>
       Ajouter des sélections

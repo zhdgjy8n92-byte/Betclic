@@ -1,7 +1,7 @@
 /**
  * Base de données du Mercat'odds.
  *
- * Mécanique : un seul guess par jour. Le joueur désigne le transfert qu'il
+ * Mécanique : un seul prono par jour. Le joueur désigne le transfert qu'il
  * pense voir officialisé dans la journée et empoche `gainBase` en feebets si
  * ça tombe. Il peut gonfler cette cagnotte en ajoutant des sélections
  * complémentaires (club d'arrivée, heure d'officialisation, montant…), chacune
@@ -25,8 +25,8 @@ window.MERCATODDS_RUMEURS = [
     poste: 'Attaquant',
     age: 26,
     nationalite: '🇪🇸',
-    clubActuel: { nom: 'FC Barcelone', couleur: '#A50044' },
-    clubCible: { nom: 'Paris SG', couleur: '#004170' },
+    clubActuel: { nom: 'FC Barcelone', couleur: '#A50044', ecusson: 'assets/img/clubs/barcelone.png' },
+    clubCible: { nom: 'Paris SG', couleur: '#004170', ecusson: 'assets/img/clubs/psg.png' },
     montant: '50 M€',
     fiabilite: 88,
     chaud: true,
@@ -82,8 +82,8 @@ window.MERCATODDS_RUMEURS = [
     poste: 'Milieu défensif',
     age: 29,
     nationalite: '🇪🇸',
-    clubActuel: { nom: 'Manchester City', couleur: '#6CABDD' },
-    clubCible: { nom: 'FC Barcelone', couleur: '#A50044' },
+    clubActuel: { nom: 'Manchester City', couleur: '#6CABDD', ecusson: 'assets/img/clubs/manchester-city.png' },
+    clubCible: { nom: 'FC Barcelone', couleur: '#A50044', ecusson: 'assets/img/clubs/barcelone.png' },
     montant: '50 M€',
     fiabilite: 85,
     chaud: true,
@@ -131,8 +131,8 @@ window.MERCATODDS_RUMEURS = [
     poste: 'Milieu',
     age: 18,
     nationalite: '🇲🇦',
-    clubActuel: { nom: 'LOSC Lille', couleur: '#E01E13' },
-    clubCible: { nom: 'Manchester City', couleur: '#6CABDD' },
+    clubActuel: { nom: 'LOSC Lille', couleur: '#E01E13', ecusson: 'assets/img/clubs/lille.png' },
+    clubCible: { nom: 'Manchester City', couleur: '#6CABDD', ecusson: 'assets/img/clubs/manchester-city.png' },
     montant: '100 M€',
     fiabilite: 72,
     chaud: true,
@@ -180,8 +180,8 @@ window.MERCATODDS_RUMEURS = [
     poste: 'Ailier',
     age: 23,
     nationalite: '🇫🇷',
-    clubActuel: { nom: 'Paris SG', couleur: '#004170' },
-    clubCible: { nom: 'Liverpool', couleur: '#C8102E' },
+    clubActuel: { nom: 'Paris SG', couleur: '#004170', ecusson: 'assets/img/clubs/psg.png' },
+    clubCible: { nom: 'Liverpool', couleur: '#C8102E', ecusson: 'assets/img/clubs/liverpool.png' },
     montant: '150 M€',
     fiabilite: 28,
     chaud: false,
@@ -229,8 +229,8 @@ window.MERCATODDS_RUMEURS = [
     poste: 'Attaquant',
     age: 25,
     nationalite: '🇦🇷',
-    clubActuel: { nom: 'Atlético Madrid', couleur: '#CE3524' },
-    clubCible: { nom: 'FC Barcelone', couleur: '#A50044' },
+    clubActuel: { nom: 'Atlético Madrid', couleur: '#CE3524', ecusson: 'assets/img/clubs/atletico.png' },
+    clubCible: { nom: 'FC Barcelone', couleur: '#A50044', ecusson: 'assets/img/clubs/barcelone.png' },
     montant: '120 M€',
     fiabilite: 12,
     chaud: false,

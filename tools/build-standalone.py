@@ -55,8 +55,17 @@ def main():
     )
 
     # --- Scripts (les données d'abord, puis l'application) ---
+    # Les chemins d'images cités dans le JS (écussons, pastille Feebet) sont
+    # injectés au moment du rendu : l'inlineur HTML ne les voit pas, il faut
+    # donc les remplacer directement dans le code.
+    def remplacer_chaine(m):
+        quote, ref = m.group(1), m.group(2)
+        return quote + data_uri(RACINE / ref) + quote
+
     for src in ('data/rumeurs.js', 'js/app.js'):
         code = (RACINE / src).read_text(encoding='utf-8')
+        code = re.sub(r"""(['"])(assets/[^'"]+\.(?:png|svg|jpg|webp))\1""",
+                      remplacer_chaine, code)
         # Un </script> dans une chaîne fermerait la balise prématurément
         code = code.replace('</script>', '<\\/script>')
         html = html.replace(

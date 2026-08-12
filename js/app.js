@@ -1,7 +1,7 @@
 /* =========================================================
    Betclic Mercat'odds — logique applicative
    ---------------------------------------------------------
-   Un seul guess par jour. Le joueur désigne le transfert qu'il
+   Un seul prono par jour. Le joueur désigne le transfert qu'il
    pense voir officialisé dans la journée : s'il tombe juste, il
    empoche des feebets. Il peut gonfler la cagnotte en ajoutant
    des sélections complémentaires depuis la fiche de la rumeur.
@@ -11,13 +11,13 @@
 (function () {
   'use strict';
 
-  var STORAGE_KEY = 'mercatodds.guess';
+  var STORAGE_KEY = 'mercatodds.prono';
 
   var rumeurs = window.MERCATODDS_RUMEURS || [];
   var historique = window.MERCATODDS_HISTORIQUE || [];
 
   /* ---------- État ---------- */
-  var guess = null;      // guess validé du jour
+  var prono = null;      // prono validé du jour
   var brouillon = null;  // fiche en cours d'édition
 
   /* ---------- Raccourcis DOM ---------- */
@@ -71,7 +71,7 @@
       var brut = localStorage.getItem(STORAGE_KEY);
       if (!brut) return null;
       var g = JSON.parse(brut);
-      // Un guess n'est valable que pour sa journée.
+      // Un prono n'est valable que pour sa journée.
       return g && g.date === jourISO() ? g : null;
     } catch (e) {
       return null;
@@ -80,7 +80,7 @@
 
   function sauver() {
     try {
-      if (guess) localStorage.setItem(STORAGE_KEY, JSON.stringify(guess));
+      if (prono) localStorage.setItem(STORAGE_KEY, JSON.stringify(prono));
       else localStorage.removeItem(STORAGE_KEY);
     } catch (e) { /* mode privé : on ignore */ }
   }
@@ -121,61 +121,75 @@
     return ' fiab__fill--low';
   }
 
+  function gabaritClub(club) {
+    // L'écusson officiel si on l'a, sinon une pastille aux couleurs du club
+    var visuel = club.ecusson
+      ? '<img class="rumeur__crest" src="' + club.ecusson + '" alt="" loading="lazy">'
+      : '<i class="rumeur__crest rumeur__crest--uni" style="background:' + club.couleur + '"></i>';
+    return '<span class="rumeur__club">' + visuel + echapper(club.nom) + '</span>';
+  }
+
   function gabaritRoute(rumeur) {
     return (
-      '<span class="rumeur__club"><i class="rumeur__crest" style="background:' + rumeur.clubActuel.couleur + '"></i>' + echapper(rumeur.clubActuel.nom) + '</span>' +
+      gabaritClub(rumeur.clubActuel) +
       '<span class="rumeur__arrow" aria-label="vers">→</span>' +
-      '<span class="rumeur__club"><i class="rumeur__crest" style="background:' + rumeur.clubCible.couleur + '"></i>' + echapper(rumeur.clubCible.nom) + '</span>'
+      gabaritClub(rumeur.clubCible)
     );
   }
 
   function gabaritRumeur(rumeur) {
-    var estChoisi = guess && guess.rumeurId === rumeur.id;
-    var estBloque = guess && !estChoisi;
+    var estChoisi = prono && prono.rumeurId === rumeur.id;
+    var estBloque = prono && !estChoisi;
 
     var classes = 'rumeur';
-    if (rumeur.chaud && !guess) classes += ' is-hot';
+    if (rumeur.chaud && !prono) classes += ' is-hot';
     if (estChoisi) classes += ' is-chosen';
     if (estBloque) classes += ' is-locked';
 
     var pastille = '';
     if (estChoisi) {
-      pastille = '<span class="pill pill--chosen">✓ Ton guess</span>';
-    } else if (rumeur.chaud && !guess) {
+      pastille = '<span class="pill pill--chosen">✓ Ton prono</span>';
+    } else if (rumeur.chaud && !prono) {
       pastille = '<span class="pill pill--hot">🔥 Chaud</span>';
     }
 
-    // Barre d'action : bouton jaune de validation, ou état verrouillé
+    // Barre d'action. Les sélections additionnelles ne sont accessibles que
+    // depuis le pop-up : la carte ne propose donc que le bouton de prono.
     var cta;
     if (estBloque) {
-      cta = '<div class="cta"><div class="cta__locked">🔒 Guess du jour déjà utilisé</div></div>';
+      cta = '<div class="cta"><div class="cta__locked">🔒 Prono du jour déjà utilisé</div></div>';
     } else if (estChoisi) {
       cta =
         '<div class="cta">' +
-          '<button class="cta__boost" type="button" data-ouvrir="' + rumeur.id + '">' +
-            '<b><span class="cta__plus" aria-hidden="true">+</span>Modifier</b>' +
-            '<small>Ajuster mes sélections</small>' +
-          '</button>' +
+          '<div class="cta__etat">' +
+            '<b>Prono enregistré</b>' +
+            '<small>Modifiable jusqu\'à minuit</small>' +
+          '</div>' +
           '<button class="cta__go" type="button" data-ouvrir="' + rumeur.id + '">' +
-            '<small>À gagner</small><b>' + guess.gain + ' €</b>' +
+            '<small>À gagner</small><b>' + prono.gain + ' €</b>' +
           '</button>' +
         '</div>';
     } else {
       cta =
         '<div class="cta">' +
-          '<button class="cta__boost" type="button" data-ouvrir="' + rumeur.id + '">' +
-            '<b><span class="cta__plus" aria-hidden="true">+</span>Ajouter des sélections</b>' +
-            '<small>Club, heure, montant…</small>' +
-          '</button>' +
+          '<div class="cta__etat">' +
+            '<b>Officialisé aujourd\'hui ?</b>' +
+            '<small>Touche pour pronostiquer</small>' +
+          '</div>' +
           '<button class="cta__go" type="button" data-valider="' + rumeur.id + '">' +
-            '<small>Guess du jour</small><b>' + rumeur.gainBase + ' €</b>' +
+            '<small>Prono du jour</small><b>' + rumeur.gainBase + ' €</b>' +
           '</button>' +
         '</div>';
     }
 
+    // La carte entière ouvre le pop-up ; une fois le prono posé, elle rouvre
+    // la fiche pour ajuster les sélections.
+    var action = estBloque ? '' :
+      (estChoisi ? ' data-ouvrir="' + rumeur.id + '"' : ' data-valider="' + rumeur.id + '"');
+
     return (
       '<article class="' + classes + '" data-id="' + rumeur.id + '">' +
-        '<button class="rumeur__banner" type="button" data-ouvrir="' + rumeur.id + '"' +
+        '<button class="rumeur__banner" type="button"' + action +
           ' style="--from-color:' + rumeur.clubActuel.couleur + ';--to-color:' + rumeur.clubCible.couleur + '">' +
           (pastille ? '<div class="rumeur__flags">' + pastille + '</div>' : '') +
           '<span class="rumeur__avatar">' + echapper(rumeur.initiales) + '</span>' +
@@ -188,7 +202,7 @@
           '</span>' +
         '</button>' +
 
-        '<button class="rumeur__article" type="button" data-ouvrir="' + rumeur.id + '">' +
+        '<button class="rumeur__article" type="button"' + action + '>' +
           '<span class="rumeur__source">' +
             '<span class="rumeur__source-name">' + echapper(rumeur.source) + '</span>' +
             '<span class="dot">•</span>' + echapper(rumeur.tempsSource) +
@@ -213,27 +227,27 @@
   }
 
   /* =========================================================
-     Ticket du guess validé
+     Ticket du prono validé
      ========================================================= */
   function rendreTicket() {
-    if (!guess) {
+    if (!prono) {
       ticketEl.hidden = true;
       ticketEl.innerHTML = '';
       return;
     }
 
-    var rumeur = trouverRumeur(guess.rumeurId);
+    var rumeur = trouverRumeur(prono.rumeurId);
     if (!rumeur) { ticketEl.hidden = true; return; }
 
     var lignes = [{
       titre: 'Transfert officialisé aujourd\'hui',
       sous: rumeur.joueur + ' quitte ' + rumeur.clubActuel.nom,
       bonus: rumeur.gainBase
-    }].concat(detailSelections(rumeur, guess.selections));
+    }].concat(detailSelections(rumeur, prono.selections));
 
     ticketEl.innerHTML =
       '<div class="ticket__card">' +
-        '<div class="ticket__top">🎟️ Ton guess du jour</div>' +
+        '<div class="ticket__top">🎟️ Ton prono du jour</div>' +
         '<div class="ticket__body">' +
           '<h2 class="ticket__joueur">' + echapper(rumeur.joueur) + '</h2>' +
           '<p class="ticket__route">' + echapper(rumeur.clubActuel.nom) + ' → ' + echapper(rumeur.clubCible.nom) + '</p>' +
@@ -253,12 +267,12 @@
             '<span class="ticket__total-label">Feebets à gagner</span>' +
             '<span class="total-wrap">' +
               '<img class="feebet-ico" src="assets/img/feebet.svg" alt="" width="26" height="26">' +
-              '<span class="ticket__total-value">' + guess.gain + ' €</span>' +
+              '<span class="ticket__total-value">' + prono.gain + ' €</span>' +
             '</span>' +
           '</div>' +
           '<div class="ticket__actions">' +
             '<button class="ticket__edit" type="button" data-ouvrir="' + rumeur.id + '">Modifier</button>' +
-            '<button class="ticket__cancel" type="button" id="ticket-cancel">Annuler mon guess</button>' +
+            '<button class="ticket__cancel" type="button" id="ticket-cancel">Annuler mon prono</button>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -267,7 +281,7 @@
   }
 
   /* =========================================================
-     Série de guess
+     Série de prono
      ========================================================= */
   function rendreStreak() {
     var row = $('#streak-row');
@@ -283,13 +297,13 @@
         ' title="' + echapper(h.jour + ' — ' + h.libelle) + '"></span>';
     });
 
-    items.push('<span class="streak__item streak__item--today' + (guess ? ' is-done' : '') +
+    items.push('<span class="streak__item streak__item--today' + (prono ? ' is-done' : '') +
       '" title="Aujourd\'hui"></span>');
 
     row.innerHTML = items.join('');
 
-    $('#streak-label').innerHTML = guess
-      ? 'Guess enregistré <span class="dot">•</span> série en cours : <b>' + serie + ' jours</b>'
+    $('#streak-label').innerHTML = prono
+      ? 'Prono enregistré <span class="dot">•</span> série en cours : <b>' + serie + ' jours</b>'
       : 'Série en cours : <b>' + serie + ' jours</b> <span class="dot">•</span> ne la brise pas';
   }
 
@@ -343,7 +357,7 @@
         '<span class="base__check" aria-hidden="true">✓</span>' +
         '<span class="base__texte">' +
           '<span class="base__t">Le transfert est officialisé aujourd\'hui</span>' +
-          '<span class="base__s">Ton guess du jour, acquis par défaut</span>' +
+          '<span class="base__s">Ton prono du jour, acquis par défaut</span>' +
         '</span>' +
         '<span class="base__gain"><b>' + rumeur.gainBase + ' €</b></span>' +
       '</div>' +
@@ -368,9 +382,9 @@
     }
 
     var nb = Object.keys(brouillon.selections).length;
-    $('#sheet-submit').textContent = guess && guess.rumeurId === brouillon.rumeur.id
-      ? 'Mettre à jour mon guess'
-      : 'Valider mon guess';
+    $('#sheet-submit').textContent = prono && prono.rumeurId === brouillon.rumeur.id
+      ? 'Mettre à jour mon prono'
+      : 'Valider mon prono';
     $('#sheet-hint').textContent = nb === 0
       ? 'Sans sélection additionnelle, tu joues le transfert seul.'
       : nb + (nb > 1 ? ' sélections ajoutées' : ' sélection ajoutée') + ' — toutes doivent être justes.';
@@ -380,16 +394,16 @@
     var rumeur = trouverRumeur(rumeurId);
     if (!rumeur) return;
 
-    // Un seul guess par jour : les autres rumeurs sont consultables mais figées.
-    if (guess && guess.rumeurId !== rumeurId) {
-      toast('Un seul guess par jour — reviens demain !');
+    // Un seul prono par jour : les autres rumeurs sont consultables mais figées.
+    if (prono && prono.rumeurId !== rumeurId) {
+      toast('Un seul prono par jour — reviens demain !');
       return;
     }
 
     brouillon = {
       rumeur: rumeur,
-      selections: guess && guess.rumeurId === rumeurId
-        ? JSON.parse(JSON.stringify(guess.selections))
+      selections: prono && prono.rumeurId === rumeurId
+        ? JSON.parse(JSON.stringify(prono.selections))
         : {}
     };
 
@@ -412,7 +426,7 @@
      ---------------------------------------------------------
      Le bouton jaune ne valide plus directement : on demande
      d'abord si le joueur confirme ou s'il préfère enrichir son
-     guess de sélections additionnelles.
+     prono de sélections additionnelles.
      ========================================================= */
   function ouvrirModal(rumeurId) {
     var rumeur = trouverRumeur(rumeurId);
@@ -442,12 +456,12 @@
   /* =========================================================
      Validation
      ========================================================= */
-  function validerGuess(rumeurId, selections) {
+  function validerProno(rumeurId, selections) {
     var rumeur = trouverRumeur(rumeurId);
     if (!rumeur) return;
 
     selections = selections || {};
-    guess = {
+    prono = {
       date: jourISO(),
       rumeurId: rumeurId,
       selections: selections,
@@ -458,18 +472,18 @@
     rendreTout();
     majCompteur();
 
-    toast('Guess validé · ' + guess.gain + ' € de feebets en jeu');
+    toast('Prono validé · ' + prono.gain + ' € de feebets en jeu');
 
     // On remonte sur le ticket pour matérialiser la validation
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function annulerGuess() {
-    guess = null;
+  function annulerProno() {
+    prono = null;
     sauver();
     rendreTout();
     majCompteur();
-    toast('Guess annulé — tu peux rejouer aujourd\'hui');
+    toast('Prono annulé — tu peux rejouer aujourd\'hui');
   }
 
   function rendreTout() {
@@ -490,7 +504,7 @@
     var el = $('#countdown-value');
     var label = $('#countdown-label');
 
-    label.textContent = guess ? 'Résultat dans' : 'Guess ouvert encore';
+    label.textContent = prono ? 'Résultat dans' : 'Prono ouvert encore';
 
     if (reste <= 0) {
       el.textContent = 'Clôturé';
@@ -522,7 +536,7 @@
     if (e.target.closest('#modal-valider') && rumeurEnAttente) {
       var id = rumeurEnAttente.id;
       fermerModal();
-      validerGuess(id, {});
+      validerProno(id, {});
       return;
     }
 
@@ -562,11 +576,11 @@
       var r = brouillon.rumeur.id;
       var s = brouillon.selections;
       fermerSheet();
-      validerGuess(r, s);
+      validerProno(r, s);
       return;
     }
 
-    if (e.target.closest('#ticket-cancel')) { annulerGuess(); }
+    if (e.target.closest('#ticket-cancel')) { annulerProno(); }
   });
 
   document.addEventListener('keydown', function (e) {
@@ -578,7 +592,7 @@
   /* =========================================================
      Démarrage
      ========================================================= */
-  guess = charger();
+  prono = charger();
   majDate();
   rendreTout();
   majCompteur();
