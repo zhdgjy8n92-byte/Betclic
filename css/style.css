@@ -568,6 +568,8 @@ h1, h2, h3 { margin: 0; }
   pointer-events: none;
 }
 
+/* Portrait du joueur : la photo se superpose aux initiales, qui servent de
+   repli tant qu'aucun fichier n'est déposé dans assets/img/joueurs/. */
 .rumeur__avatar {
   position: relative;
   z-index: 1;
@@ -578,11 +580,37 @@ h1, h2, h3 { margin: 0; }
   border: 2px solid rgba(255,255,255,.25);
   display: grid;
   place-items: center;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,.4);
+}
+
+.rumeur__initiales {
   font-family: 'Betclic Condensed', sans-serif;
   font-weight: 700;
   font-size: 17px;
   letter-spacing: .5px;
+  color: #fff;
 }
+
+.rumeur__photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Cadrage sur le visage : les portraits sportifs sont centrés haut */
+  object-position: 50% 12%;
+}
+
+/* Déclinaison de la fiche */
+.rumeur__avatar--grand {
+  width: 74px; height: 74px;
+  flex: 0 0 74px;
+  margin-bottom: 12px;
+  border-width: 3px;
+}
+
+.rumeur__avatar--grand .rumeur__initiales { font-size: 27px; }
 
 .rumeur__ident { position: relative; z-index: 1; min-width: 0; flex: 1; display: block; }
 

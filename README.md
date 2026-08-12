@@ -182,6 +182,27 @@ Pour passer au fichier source officiel, il suffit de déposer le vôtre dans
 dépend au-delà de la hauteur (`.brand__logo`) et de la largeur
 (`.hero__logo-img`).
 
+## Portraits des joueurs
+
+Déposer les fichiers dans `assets/img/joueurs/`, nommés :
+
+```
+ferran-torres.png   rodri.png   bouaddi.png   barcola.png   alvarez.png
+```
+
+Ils apparaissent aussitôt dans la pastille de chaque carte et en tête de la
+fiche. Tant qu'un fichier manque, les initiales du joueur prennent le relais :
+l'image se retire d'elle-même si elle ne charge pas, rien ne casse et
+l'assemblage du fichier autonome n'échoue pas non plus.
+
+Format conseillé : portrait cadré serré, au moins 300 × 375 px. L'image est
+recadrée en cercle avec un centrage haut, comme les portraits sportifs. Pour
+changer un nom ou une extension, modifier le champ `photo` de la rumeur dans
+`data/rumeurs.js`.
+
+Ces portraits sont des photographies de presse : leur usage dans une campagne
+réelle suppose une licence auprès de l'agence détentrice.
+
 ## Ajouter une rumeur
 
 Ajouter une entrée dans `data/rumeurs.js` :

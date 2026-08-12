@@ -58,9 +58,17 @@ def main():
     # Les chemins d'images cités dans le JS (écussons, pastille Feebet) sont
     # injectés au moment du rendu : l'inlineur HTML ne les voit pas, il faut
     # donc les remplacer directement dans le code.
+    # Les portraits de joueurs sont optionnels : un fichier absent est laissé
+    # tel quel, la page retombant d'elle-même sur les initiales.
+    manquants = []
+
     def remplacer_chaine(m):
         quote, ref = m.group(1), m.group(2)
-        return quote + data_uri(RACINE / ref) + quote
+        chemin = RACINE / ref
+        if not chemin.exists():
+            manquants.append(ref)
+            return m.group(0)
+        return quote + data_uri(chemin) + quote
 
     for src in ('data/rumeurs.js', 'js/app.js'):
         code = (RACINE / src).read_text(encoding='utf-8')
@@ -83,9 +91,14 @@ def main():
     html = re.sub(r'src="((?!data:|http)[^"]+\.(?:png|svg|jpg|webp))"',
                   remplacer_img, html)
 
-    # Garde-fou : plus aucune ressource externe ne doit subsister
-    restants = re.findall(r'(?:src|href)="((?!data:|#|\.?/?$)[^"]+)"', html)
-    restants = [r for r in restants if not r.startswith(('data:', 'http', './'))]
+    if manquants:
+        print('Optionnel, absent (repli sur les initiales) : ' + ', '.join(manquants))
+
+    # Garde-fou : aucune ressource externe requise ne doit subsister. Les
+    # chemins construits dynamiquement en JS et les fichiers optionnels
+    # absents ne comptent pas.
+    restants = [r for r in re.findall(r'src="((?!data:|http)[^"]+)"', html)
+                if "' +" not in r and r not in manquants]
     if restants:
         print('Attention, références non embarquées :', restants)
 

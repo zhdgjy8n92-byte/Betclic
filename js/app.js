@@ -121,6 +121,25 @@
     return ' fiab__fill--low';
   }
 
+  /**
+   * Portrait du joueur. La photo est optionnelle : si le fichier est absent
+   * ou illisible, l'image se retire d'elle-même et les initiales restent.
+   * Déposer un fichier dans assets/img/joueurs/ suffit donc à l'activer.
+   */
+  function gabaritAvatar(rumeur, modif) {
+    var classe = 'rumeur__avatar' + (modif ? ' ' + modif : '');
+    var photo = rumeur.photo
+      ? '<img class="rumeur__photo" src="' + rumeur.photo + '" alt="" loading="lazy"' +
+        ' onerror="this.parentNode.removeChild(this)">'
+      : '';
+    return (
+      '<span class="' + classe + '">' +
+        '<span class="rumeur__initiales">' + echapper(rumeur.initiales) + '</span>' +
+        photo +
+      '</span>'
+    );
+  }
+
   function gabaritClub(club) {
     // L'écusson officiel si on l'a, sinon une pastille aux couleurs du club
     var visuel = club.ecusson
@@ -192,7 +211,7 @@
         '<button class="rumeur__banner" type="button"' + action +
           ' style="--from-color:' + rumeur.clubActuel.couleur + ';--to-color:' + rumeur.clubCible.couleur + '">' +
           (pastille ? '<div class="rumeur__flags">' + pastille + '</div>' : '') +
-          '<span class="rumeur__avatar">' + echapper(rumeur.initiales) + '</span>' +
+          gabaritAvatar(rumeur) +
           '<span class="rumeur__ident">' +
             '<span class="rumeur__name">' + echapper(rumeur.joueur) +
               '<span class="rumeur__flag">' + rumeur.nationalite + '</span></span>' +
@@ -341,6 +360,7 @@
 
     sheetScroll.innerHTML =
       '<div class="sheet__hero" style="--from-color:' + rumeur.clubActuel.couleur + ';--to-color:' + rumeur.clubCible.couleur + '">' +
+        gabaritAvatar(rumeur, 'rumeur__avatar--grand') +
         '<h2 class="sheet__joueur" id="sheet-joueur">' + echapper(rumeur.joueur) + ' ' + rumeur.nationalite + '</h2>' +
         '<p class="sheet__meta">' + echapper(rumeur.poste) + ' <span class="dot">•</span> ' + rumeur.age + ' ans' +
           ' <span class="dot">•</span> ' + echapper(rumeur.source) + ', ' + echapper(rumeur.tempsSource) + '</p>' +
