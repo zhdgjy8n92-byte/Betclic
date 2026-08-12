@@ -66,6 +66,40 @@ python3 -m http.server 8000
 Le site fonctionne aussi en ouvrant directement `index.html` (les données sont
 chargées via un script, pas via `fetch`).
 
+## Mettre en ligne
+
+### Fichier autonome (le plus simple)
+
+```bash
+python3 tools/build-standalone.py
+# → dist/mercatodds.html, ~1 Mo, polices et images embarquées
+```
+
+Le fichier obtenu ne fait aucune requête réseau. Il s'ouvre directement depuis
+le disque, et se dépose tel quel sur n'importe quel hébergeur statique :
+glissez-le sur [Netlify Drop](https://app.netlify.com/drop) pour obtenir une URL
+publique en quelques secondes, sans compte ni ligne de commande.
+
+### GitHub Pages
+
+Le workflow `.github/workflows/pages.yml` déploie la racine du dépôt à chaque
+push sur la branche par défaut. Il faut l'autoriser une première fois, le jeton
+d'un workflow n'ayant pas le droit de créer le site lui-même :
+
+1. **Settings › Pages › Source** : choisir « GitHub Actions ».
+2. Relancer le workflow (onglet Actions, ou un nouveau push).
+
+À noter : Pages sur un dépôt **privé** demande un compte GitHub Pro ou Team. Sur
+un compte gratuit, il faut rendre le dépôt public — et le site publié est
+public dans tous les cas.
+
+### Référencement
+
+Le site porte une méta `noindex` et un `robots.txt` interdisant l'exploration :
+il reste accessible par lien, mais ne remonte pas dans les moteurs de recherche.
+C'est délibéré — la maquette porte la marque Betclic et des rumeurs fictives
+attribuées à de vrais médias.
+
 ## Structure
 
 ```
