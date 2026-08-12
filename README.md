@@ -59,16 +59,32 @@ Reprise de l'app Betclic à partir de la capture fournie :
 | Titres | Betclic Condensed Bold, en capitales |
 | Textes | Betclic Regular / Bold |
 
-Le logo de l'opération est reconstitué en CSS (`.oplogo`) : pavé rouge
-« Betclic » surmontant le mot MERCAT'ODDS en blanc à contour rouge. Deux
-variantes partagent la même mécanique, `--logo-size` et `--logo-stroke` pilotant
-la taille et l'épaisseur du contour :
+## Logo
 
-- `.oplogo--stack` : lock-up vertical, utilisé en une ;
-- `.oplogo--inline` : version compacte horizontale, utilisée dans le header.
+Le logo de l'opération est servi comme image, en deux déclinaisons :
 
-Pour passer au fichier source du logo, remplacer les deux blocs `.oplogo` par une
-balise `<img>` — aucun autre style n'en dépend.
+```
+assets/img/logo-mercatodds.svg          lock-up vertical, utilisé en une
+assets/img/logo-mercatodds-inline.svg   version compacte, utilisée dans le header
+```
+
+Ces SVG sont générés par `tools/make-logo.py`, qui extrait les tracés des
+glyphes directement des polices Betclic : le mot est donc du vrai vectoriel, sans
+dépendance à une police au moment du rendu.
+
+```bash
+pip install fonttools
+python3 tools/make-logo.py
+```
+
+Les proportions se règlent en tête de `build()` : `b_size` (pavé Betclic),
+`m_size` (taille du mot), `stroke` (épaisseur du contour rouge) et les angles
+d'inclinaison `skew_b` / `skew_m`.
+
+Pour passer au fichier source officiel, il suffit de déposer le vôtre dans
+`assets/img/` et d'ajuster les deux `src` dans `index.html` — aucun style n'en
+dépend au-delà de la hauteur (`.brand__logo`) et de la largeur
+(`.hero__logo-img`).
 
 ## Ajouter une rumeur
 
