@@ -47,8 +47,8 @@
 
     <p class="hero__title">Le guess du jour</p>
     <p class="hero__baseline">
-      Un seul pronostic par jour. Désignez le transfert qui sera
-      <strong>officialisé aujourd'hui</strong> et repartez avec des freebets.
+      Un seul pronostic par jour. Désigne le transfert qui sera
+      <strong>officialisé aujourd'hui</strong> et repars avec des freebets.
     </p>
 
     <div class="streak">
@@ -69,7 +69,7 @@
 <!-- ============ FEED ============ -->
 <div class="feed-head" id="feed-head">
   <h2 class="feed-head__title">Les rumeurs du jour</h2>
-  <p class="feed-head__sub">Touchez <b>5 €</b> pour valider votre guess, ou ouvrez une rumeur pour booster vos freebets.</p>
+  <p class="feed-head__sub">Touche le montant pour poser ton guess, ou ouvre une rumeur pour booster tes freebets.</p>
 </div>
 
 <main class="feed" id="feed"></main>
@@ -101,6 +101,26 @@
     </div>
   </div>
 </aside>
+
+<!-- ============ CONFIRMATION DU GUESS ============ -->
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-titre">
+    <h2 class="modal__titre" id="modal-titre">Tu valides ce guess ?</h2>
+    <p class="modal__texte" id="modal-texte"></p>
+
+    <div class="modal__gain">
+      <span class="modal__gain-label">Freebets à gagner</span>
+      <strong class="modal__gain-value" id="modal-gain">5 €</strong>
+    </div>
+
+    <button class="modal__primary" type="button" id="modal-valider">Valider mon guess</button>
+    <button class="modal__secondary" type="button" id="modal-booster">
+      <span class="modal__plus" aria-hidden="true">+</span>
+      Ajouter des sélections
+    </button>
+    <button class="modal__cancel" type="button" data-close-modal>Annuler</button>
+  </div>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

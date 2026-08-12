@@ -7,54 +7,70 @@
  * complémentaires (club d'arrivée, heure d'officialisation, montant…), chacune
  * valant le `bonus` en freebets indiqué sur la puce.
  *
+ * Cohérence des montants : le gain est l'inverse de la probabilité. Un dossier
+ * quasiment bouclé rapporte peu (5 €), un dossier enlisé rapporte gros (40 €).
+ * Même logique sur chaque option de booster : l'issue attendue vaut quelques
+ * euros, l'issue improbable en vaut plusieurs dizaines.
+ *
+ * Les rumeurs sont classées par fiabilité décroissante et les statuts reflètent
+ * l'état réel des dossiers au 12 août 2026 (voir README pour les sources).
+ *
  * Aucune cote n'est affichée nulle part : tout est exprimé en euros de freebets.
  */
 window.MERCATODDS_RUMEURS = [
   {
-    id: 'alvarez-barca',
-    joueur: 'Julián Álvarez',
-    initiales: 'JA',
+    id: 'ferran-psg',
+    joueur: 'Ferran Torres',
+    initiales: 'FT',
     poste: 'Attaquant',
-    age: 25,
-    nationalite: '🇦🇷',
-    clubActuel: { nom: 'Atlético Madrid', couleur: '#CE3524' },
-    clubCible: { nom: 'FC Barcelone', couleur: '#A50044' },
-    montant: '85 M€',
-    fiabilite: 78,
+    age: 26,
+    nationalite: '🇪🇸',
+    clubActuel: { nom: 'FC Barcelone', couleur: '#A50044' },
+    clubCible: { nom: 'Paris SG', couleur: '#004170' },
+    montant: '50 M€',
+    fiabilite: 88,
     chaud: true,
-    competition: 'Liga',
-    source: 'Mundo Deportivo',
-    tempsSource: 'il y a 2 h',
-    titre: "Le Barça accélère pour Julián Álvarez",
+    competition: 'Ligue 1',
+    source: "L'Équipe",
+    tempsSource: 'il y a 40 min',
+    titre: 'Ferran Torres au PSG : accord imminent avec le Barça',
     chapo:
-      "Deux ans après son arrivée à Madrid, Julián Álvarez serait la priorité offensive du FC Barcelone. Les dirigeants catalans ont transmis une première offre de 75 M€, jugée insuffisante par l'Atlético qui réclame 90 M€. L'Argentin, lui, aurait déjà donné son accord de principe pour un contrat de cinq ans. Les deux clubs se sont parlé hier soir et une nouvelle réunion est calée dans la journée.",
+      "Les discussions entre Paris et le FC Barcelone sont entrées dans leur dernière ligne droite, pour un montant attendu autour de 50 M€. Ferran Torres a donné son accord final aux Parisiens et espère voir son départ acté avant le 12 août, date de son retour à l'entraînement barcelonais. Champion du monde avec l'Espagne le 19 juillet, l'attaquant sort de la meilleure saison de sa carrière : 21 buts et 3 passes décisives en 49 matches.",
     gainBase: 5,
     boosters: [
       {
         id: 'club',
-        titre: "Dans quel club signe-t-il ?",
+        titre: 'Dans quel club signe-t-il ?',
         options: [
-          { label: 'FC Barcelone', bonus: 8 },
-          { label: 'Chelsea', bonus: 25 },
-          { label: 'Un autre club', bonus: 40 }
+          { label: 'Paris SG', bonus: 3 },
+          { label: 'Aston Villa', bonus: 40 },
+          { label: 'Un autre club', bonus: 55 }
         ]
       },
       {
         id: 'heure',
         titre: "À quelle heure tombe l'officialisation ?",
         options: [
-          { label: 'Avant 14 h', bonus: 12 },
-          { label: 'Entre 14 h et 19 h', bonus: 10 },
-          { label: 'Après 19 h', bonus: 15 }
+          { label: 'Avant 14 h', bonus: 9 },
+          { label: 'Entre 14 h et 19 h', bonus: 7 },
+          { label: 'Après 19 h', bonus: 11 }
         ]
       },
       {
         id: 'montant',
         titre: 'Pour quel montant ?',
         options: [
-          { label: 'Moins de 75 M€', bonus: 15 },
-          { label: '75 à 90 M€', bonus: 10 },
-          { label: 'Plus de 90 M€', bonus: 22 }
+          { label: 'Moins de 45 M€', bonus: 14 },
+          { label: '45 à 55 M€', bonus: 6 },
+          { label: 'Plus de 55 M€', bonus: 20 }
+        ]
+      },
+      {
+        id: 'formule',
+        titre: 'Sous quelle forme ?',
+        options: [
+          { label: 'Transfert sec', bonus: 4 },
+          { label: 'Prêt avec option', bonus: 26 }
         ]
       }
     ]
@@ -68,24 +84,122 @@ window.MERCATODDS_RUMEURS = [
     nationalite: '🇪🇸',
     clubActuel: { nom: 'Manchester City', couleur: '#6CABDD' },
     clubCible: { nom: 'FC Barcelone', couleur: '#A50044' },
-    montant: '70 M€',
-    fiabilite: 41,
-    chaud: false,
-    competition: 'Premier League',
-    source: 'SPORT',
-    tempsSource: 'il y a 6 h',
-    titre: 'Rodri, le rêve impossible du Barça ?',
+    montant: '50 M€',
+    fiabilite: 85,
+    chaud: true,
+    competition: 'Liga',
+    source: 'Cadena SER',
+    tempsSource: 'il y a 1 h',
+    titre: 'Rodri au Barça : accord bouclé avec Manchester City',
     chapo:
-      "Le Ballon d'Or 2024 aurait fait savoir à son entourage qu'un retour en Espagne l'intéresse. Le FC Barcelone a coché son nom, mais Manchester City refuse catégoriquement d'ouvrir la discussion à moins de 100 M€. Un dossier au point mort, que la Cadena SER décrit pourtant comme « loin d'être clos ».",
+      "Le Barça et Manchester City ont trouvé un accord autour de 50 M€ pour le Ballon d'Or 2024. Rodri a écarté les avances du Real Madrid et n'a jamais caché sa préférence pour la Catalogne. Son arrivée est attendue ce 12 août, en même temps que le retour des internationaux espagnols du Mondial. La rupture du ligament collatéral médial du genou droit de Frenkie de Jong a fini d'accélérer le dossier.",
     gainBase: 5,
     boosters: [
       {
         id: 'club',
-        titre: "Dans quel club signe-t-il ?",
+        titre: 'Dans quel club signe-t-il ?',
         options: [
-          { label: 'FC Barcelone', bonus: 20 },
-          { label: 'Real Madrid', bonus: 45 },
+          { label: 'FC Barcelone', bonus: 3 },
+          { label: 'Real Madrid', bonus: 50 },
+          { label: 'Un autre club', bonus: 65 }
+        ]
+      },
+      {
+        id: 'heure',
+        titre: "À quelle heure tombe l'officialisation ?",
+        options: [
+          { label: 'Avant 14 h', bonus: 8 },
+          { label: 'Entre 14 h et 19 h', bonus: 7 },
+          { label: 'Après 19 h', bonus: 12 }
+        ]
+      },
+      {
+        id: 'montant',
+        titre: 'Pour quel montant ?',
+        options: [
+          { label: 'Moins de 50 M€', bonus: 12 },
+          { label: '50 à 60 M€', bonus: 6 },
+          { label: 'Plus de 60 M€', bonus: 22 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'bouaddi-city',
+    joueur: 'Ayyoub Bouaddi',
+    initiales: 'AB',
+    poste: 'Milieu',
+    age: 18,
+    nationalite: '🇲🇦',
+    clubActuel: { nom: 'LOSC Lille', couleur: '#E01E13' },
+    clubCible: { nom: 'Manchester City', couleur: '#6CABDD' },
+    montant: '100 M€',
+    fiabilite: 72,
+    chaud: true,
+    competition: 'Premier League',
+    source: 'Fabrizio Romano',
+    tempsSource: 'il y a 25 min',
+    titre: 'Bouaddi–City : les clubs finalisent les derniers détails',
+    chapo:
+      "Ayyoub Bouaddi a accepté un contrat courant jusqu'en juin 2031 et a reçu le feu vert pour rejoindre l'Angleterre. Lille et Manchester City règlent les derniers détails financiers d'un accord jugé imminent, pour un chèque attendu autour de 100 M€. Formé au LOSC, déjà 96 matches avec le club et révélation du parcours marocain jusqu'en quarts de finale du Mondial, le milieu de 18 ans est appelé à préparer l'après-Rodri.",
+    gainBase: 8,
+    boosters: [
+      {
+        id: 'club',
+        titre: 'Dans quel club signe-t-il ?',
+        options: [
+          { label: 'Manchester City', bonus: 4 },
+          { label: 'Chelsea', bonus: 45 },
           { label: 'Un autre club', bonus: 60 }
+        ]
+      },
+      {
+        id: 'heure',
+        titre: "À quelle heure tombe l'officialisation ?",
+        options: [
+          { label: 'Avant 14 h', bonus: 11 },
+          { label: 'Entre 14 h et 19 h', bonus: 9 },
+          { label: 'Après 19 h', bonus: 14 }
+        ]
+      },
+      {
+        id: 'montant',
+        titre: 'Pour quel montant ?',
+        options: [
+          { label: 'Moins de 90 M€', bonus: 18 },
+          { label: '90 à 110 M€', bonus: 7 },
+          { label: 'Plus de 110 M€', bonus: 24 }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'barcola-liverpool',
+    joueur: 'Bradley Barcola',
+    initiales: 'BB',
+    poste: 'Ailier',
+    age: 23,
+    nationalite: '🇫🇷',
+    clubActuel: { nom: 'Paris SG', couleur: '#004170' },
+    clubCible: { nom: 'Liverpool', couleur: '#C8102E' },
+    montant: '150 M€',
+    fiabilite: 28,
+    chaud: false,
+    competition: 'Premier League',
+    source: 'The Athletic',
+    tempsSource: 'il y a 3 h',
+    titre: 'Barcola : Liverpool monte à 115 M€, le PSG en réclame 150',
+    chapo:
+      "Les discussions sont décrites comme positives, mais l'écart de valorisation reste béant : après une première offre autour de 100 M€, Liverpool est monté à 115 M€ quand Paris n'entend pas descendre sous les 150 M€. Barcola a signalé son envie d'ailleurs après deux Ligues des champions consécutives et Luis Enrique se dit prêt à le laisser partir — le PSG travaille déjà sur son remplaçant.",
+    gainBase: 20,
+    boosters: [
+      {
+        id: 'club',
+        titre: 'Dans quel club signe-t-il ?',
+        options: [
+          { label: 'Liverpool', bonus: 12 },
+          { label: 'Bayern Munich', bonus: 45 },
+          { label: 'Un autre club', bonus: 55 }
         ]
       },
       {
@@ -101,164 +215,58 @@ window.MERCATODDS_RUMEURS = [
         id: 'montant',
         titre: 'Pour quel montant ?',
         options: [
-          { label: 'Moins de 80 M€', bonus: 30 },
-          { label: '80 à 100 M€', bonus: 20 },
-          { label: 'Plus de 100 M€', bonus: 35 }
+          { label: 'Moins de 130 M€', bonus: 26 },
+          { label: '130 à 155 M€', bonus: 16 },
+          { label: 'Plus de 155 M€', bonus: 34 }
         ]
       }
     ]
   },
   {
-    id: 'ferran-psg',
-    joueur: 'Ferran Torres',
-    initiales: 'FT',
+    id: 'alvarez-barca',
+    joueur: 'Julián Álvarez',
+    initiales: 'JA',
     poste: 'Attaquant',
-    age: 26,
-    nationalite: '🇪🇸',
-    clubActuel: { nom: 'FC Barcelone', couleur: '#A50044' },
-    clubCible: { nom: 'Paris SG', couleur: '#004170' },
-    montant: '45 M€',
-    fiabilite: 66,
-    chaud: true,
-    competition: 'Ligue 1',
-    source: "L'Équipe",
-    tempsSource: 'il y a 1 h',
-    titre: 'Le PSG passe à l’offensive sur Ferran Torres',
+    age: 25,
+    nationalite: '🇦🇷',
+    clubActuel: { nom: 'Atlético Madrid', couleur: '#CE3524' },
+    clubCible: { nom: 'FC Barcelone', couleur: '#A50044' },
+    montant: '120 M€',
+    fiabilite: 12,
+    chaud: false,
+    competition: 'Liga',
+    source: 'Mundo Deportivo',
+    tempsSource: 'il y a 2 h',
+    titre: "Álvarez au Barça : le dossier s'enlise",
     chapo:
-      "Poussé vers la sortie par l'arrivée d'un nouvel avant-centre, Ferran Torres est la cible désignée de Luis Enrique, qui l'a déjà eu en sélection. Paris a formulé une offre de 40 M€ plus bonus. Le Barça, qui doit dégraisser sa masse salariale avant le 31 août, se montrerait ouvert à la négociation. L'entourage du joueur est attendu à Paris ce matin.",
-    gainBase: 5,
+      "Álvarez a pourtant déclaré publiquement son envie de quitter l'Atlético pour le Barça, club de son cœur. Mais les Colchoneros refusent fermement de vendre leur attaquant, et surtout pas aux Catalans : les offres blaugrana ont beau être montées jusqu'à environ 120 M€, le 1er août est passé sans accord. En interne, Gavi et Pedri, proches de Ferran Torres, ne verraient pas cette arrivée d'un très bon œil.",
+    gainBase: 40,
     boosters: [
       {
         id: 'club',
-        titre: "Dans quel club signe-t-il ?",
+        titre: 'Dans quel club signe-t-il ?',
         options: [
-          { label: 'Paris SG', bonus: 7 },
-          { label: 'Aston Villa', bonus: 30 },
-          { label: 'Un autre club', bonus: 45 }
+          { label: 'FC Barcelone', bonus: 30 },
+          { label: 'Chelsea', bonus: 55 },
+          { label: 'Un autre club', bonus: 70 }
         ]
       },
       {
         id: 'heure',
         titre: "À quelle heure tombe l'officialisation ?",
         options: [
-          { label: 'Avant 14 h', bonus: 14 },
-          { label: 'Entre 14 h et 19 h', bonus: 11 },
-          { label: 'Après 19 h', bonus: 16 }
+          { label: 'Avant 14 h', bonus: 50 },
+          { label: 'Entre 14 h et 19 h', bonus: 45 },
+          { label: 'Après 19 h', bonus: 55 }
         ]
       },
       {
         id: 'montant',
         titre: 'Pour quel montant ?',
         options: [
-          { label: 'Moins de 40 M€', bonus: 16 },
-          { label: '40 à 50 M€', bonus: 9 },
-          { label: 'Plus de 50 M€', bonus: 24 }
-        ]
-      },
-      {
-        id: 'formule',
-        titre: 'Sous quelle forme ?',
-        options: [
-          { label: 'Transfert sec', bonus: 8 },
-          { label: 'Prêt avec option', bonus: 18 }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'barcola-liverpool',
-    joueur: 'Bradley Barcola',
-    initiales: 'BB',
-    poste: 'Ailier',
-    age: 23,
-    nationalite: '🇫🇷',
-    clubActuel: { nom: 'Paris SG', couleur: '#004170' },
-    clubCible: { nom: 'Liverpool', couleur: '#C8102E' },
-    montant: '90 M€',
-    fiabilite: 54,
-    chaud: true,
-    competition: 'Premier League',
-    source: 'The Athletic',
-    tempsSource: 'il y a 4 h',
-    titre: "Liverpool a fait de Barcola sa priorité",
-    chapo:
-      "Arne Slot cherche un ailier gauche capable de jouer dans le dos des défenses : Bradley Barcola coche toutes les cases. Liverpool aurait pris la température auprès du PSG, qui n'entend pas brader un joueur sous contrat jusqu'en 2028 et réclame 90 M€. Le Français n'a pour l'instant pas manifesté d'envie de départ.",
-    gainBase: 5,
-    boosters: [
-      {
-        id: 'club',
-        titre: "Dans quel club signe-t-il ?",
-        options: [
-          { label: 'Liverpool', bonus: 14 },
-          { label: 'Bayern Munich', bonus: 35 },
-          { label: 'Un autre club', bonus: 50 }
-        ]
-      },
-      {
-        id: 'heure',
-        titre: "À quelle heure tombe l'officialisation ?",
-        options: [
-          { label: 'Avant 14 h', bonus: 20 },
-          { label: 'Entre 14 h et 19 h', bonus: 17 },
-          { label: 'Après 19 h', bonus: 21 }
-        ]
-      },
-      {
-        id: 'montant',
-        titre: 'Pour quel montant ?',
-        options: [
-          { label: 'Moins de 85 M€', bonus: 22 },
-          { label: '85 à 100 M€', bonus: 14 },
-          { label: 'Plus de 100 M€', bonus: 30 }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'bouaddi-city',
-    joueur: 'Ayyoub Bouaddi',
-    initiales: 'AB',
-    poste: 'Milieu',
-    age: 18,
-    nationalite: '🇫🇷',
-    clubActuel: { nom: 'LOSC Lille', couleur: '#E01E13' },
-    clubCible: { nom: 'Manchester City', couleur: '#6CABDD' },
-    montant: '35 M€',
-    fiabilite: 84,
-    chaud: true,
-    competition: 'Premier League',
-    source: 'Fabrizio Romano',
-    tempsSource: 'il y a 25 min',
-    titre: 'Bouaddi–City : les négociations sont entrées dans le dur',
-    chapo:
-      "Manchester City a bouclé un accord de principe avec le clan Bouaddi et négocie désormais avec le LOSC. Les Cityzens sont montés à 30 M€ plus 5 M€ de bonus, Lille en demande 40. Pep Guardiola en a fait sa priorité au milieu et le dossier pourrait se conclure dans la journée : la visite médicale serait déjà programmée.",
-    gainBase: 5,
-    boosters: [
-      {
-        id: 'club',
-        titre: "Dans quel club signe-t-il ?",
-        options: [
-          { label: 'Manchester City', bonus: 6 },
-          { label: 'Chelsea', bonus: 28 },
-          { label: 'Un autre club', bonus: 42 }
-        ]
-      },
-      {
-        id: 'heure',
-        titre: "À quelle heure tombe l'officialisation ?",
-        options: [
-          { label: 'Avant 14 h', bonus: 10 },
-          { label: 'Entre 14 h et 19 h', bonus: 8 },
-          { label: 'Après 19 h', bonus: 13 }
-        ]
-      },
-      {
-        id: 'montant',
-        titre: 'Pour quel montant ?',
-        options: [
-          { label: 'Moins de 35 M€', bonus: 12 },
-          { label: '35 à 45 M€', bonus: 9 },
-          { label: 'Plus de 45 M€', bonus: 26 }
+          { label: 'Moins de 110 M€', bonus: 55 },
+          { label: '110 à 130 M€', bonus: 45 },
+          { label: 'Plus de 130 M€', bonus: 70 }
         ]
       }
     ]

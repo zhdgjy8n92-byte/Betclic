@@ -52,6 +52,56 @@
 
 * { box-sizing: border-box; }
 
+/* =========================================================
+   LIQUID GLASS
+   Deux traitements partagés par les surfaces cliquables :
+   — .glass       : verre translucide sur fond sombre
+   — .glass-sheen : reflet spéculaire posé sur une surface pleine
+                    (jaune, rouge) pour ne pas en perdre la couleur
+   ========================================================= */
+.glass {
+  background: rgba(255, 255, 255, .06);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, .13);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .22),
+    inset 0 -1px 0 rgba(0, 0, 0, .25),
+    0 6px 18px rgba(0, 0, 0, .3);
+}
+
+.glass-sheen { position: relative; overflow: hidden; }
+
+/* Le reflet : bande lumineuse en haut à gauche, qui s'estompe */
+.glass-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(152deg,
+      rgba(255, 255, 255, .55) 0%,
+      rgba(255, 255, 255, .18) 30%,
+      rgba(255, 255, 255, 0) 52%),
+    radial-gradient(120% 80% at 50% 115%,
+      rgba(0, 0, 0, .16) 0%, transparent 60%);
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+}
+
+/* Liseré interne clair en haut, ombre en bas : l'épaisseur du verre */
+.glass-sheen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .6),
+    inset 0 -1px 0 rgba(0, 0, 0, .18);
+  pointer-events: none;
+  z-index: 1;
+}
+
 /* `hidden` doit l'emporter sur les display: flex/grid des composants */
 [hidden] { display: none !important; }
 
@@ -704,8 +754,11 @@ h1, h2, h3 { margin: 0; }
 
 .cta__boost {
   flex: 1;
-  background: none;
-  border: 1px dashed var(--line);
+  background: rgba(255, 255, 255, .05);
+  backdrop-filter: blur(14px) saturate(1.5);
+  -webkit-backdrop-filter: blur(14px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16);
   border-radius: var(--r-btn);
   color: var(--text);
   text-align: left;
@@ -715,6 +768,12 @@ h1, h2, h3 { margin: 0; }
   justify-content: center;
   gap: 2px;
   min-width: 0;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.cta__boost:active {
+  background: rgba(255, 255, 255, .1);
+  border-color: rgba(255, 255, 255, .2);
 }
 
 .cta__boost b {
@@ -729,31 +788,73 @@ h1, h2, h3 { margin: 0; }
   color: var(--text-mute);
 }
 
-.cta__plus {
-  width: 17px; height: 17px;
+/* Les pastilles « + », en verre teinté rouge */
+.cta__plus,
+.modal__plus {
+  position: relative;
+  width: 18px; height: 18px;
   border-radius: 50%;
-  background: var(--red);
+  background: linear-gradient(155deg, #FF4655 0%, var(--red) 55%, #B00510 100%);
   color: #fff;
   font-size: 13px;
   display: grid;
   place-items: center;
   flex: 0 0 auto;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .55),
+    inset 0 -1px 1px rgba(0, 0, 0, .35),
+    0 2px 6px rgba(227, 6, 19, .45);
+  overflow: hidden;
 }
+
+.cta__plus::after,
+.modal__plus::after {
+  content: '';
+  position: absolute;
+  left: 12%; top: 6%;
+  width: 76%; height: 46%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+.modal__plus { width: 20px; height: 20px; font-size: 14px; }
 
 /* Le bouton jaune : la mise en freebets, jamais une cote */
 .cta__go {
+  position: relative;
+  overflow: hidden;
   flex: 0 0 auto;
   min-width: 118px;
   border: 0;
-  background: var(--yellow);
+  background: linear-gradient(158deg, #FFF0A0 0%, var(--yellow) 42%, #F2CE1E 100%);
   border-radius: var(--r-btn);
   padding: 8px 14px 10px;
   text-align: center;
   color: #0A0E1C;
-  transition: transform .12s ease, background .12s ease;
+  transition: transform .12s ease, filter .12s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .75),
+    inset 0 -2px 3px rgba(150, 110, 0, .28),
+    0 4px 14px rgba(0, 0, 0, .3);
 }
 
-.cta__go:active { transform: scale(.96); background: var(--yellow-press); }
+.cta__go::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(152deg,
+    rgba(255, 255, 255, .7) 0%,
+    rgba(255, 255, 255, .2) 28%,
+    rgba(255, 255, 255, 0) 50%);
+  pointer-events: none;
+}
+
+.cta__go:active { transform: scale(.96); filter: brightness(.94); }
+
+.cta__go small,
+.cta__go b { position: relative; z-index: 1; }
 
 .cta__go small {
   display: block;
@@ -1002,8 +1103,13 @@ h1, h2, h3 { margin: 0; }
   align-items: center;
   gap: 11px;
   width: 100%;
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, .055);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, .12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .18),
+    0 4px 14px rgba(0, 0, 0, .22);
   border-radius: 12px;
   padding: 11px 12px;
   color: #fff;
@@ -1032,8 +1138,10 @@ h1, h2, h3 { margin: 0; }
 .option__label { flex: 1; font-size: 14.5px; font-weight: 700; }
 
 .option__bonus {
+  position: relative;
+  overflow: hidden;
   flex: 0 0 auto;
-  background: var(--yellow);
+  background: linear-gradient(158deg, #FFF0A0 0%, var(--yellow) 45%, #F2CE1E 100%);
   color: #0A0E1C;
   font-family: 'Betclic Condensed', sans-serif;
   font-size: 17px;
@@ -1041,11 +1149,28 @@ h1, h2, h3 { margin: 0; }
   border-radius: 7px;
   padding: 4px 9px 5px;
   line-height: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .7),
+    inset 0 -1px 2px rgba(150, 110, 0, .25);
+}
+
+.option__bonus::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg,
+    rgba(255, 255, 255, .65) 0%,
+    rgba(255, 255, 255, .15) 32%,
+    rgba(255, 255, 255, 0) 55%);
+  pointer-events: none;
 }
 
 .option.is-selected {
-  background: rgba(227, 6, 19, .14);
-  border-color: var(--red);
+  background: rgba(227, 6, 19, .2);
+  border-color: rgba(255, 60, 75, .75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .25),
+    0 4px 16px rgba(227, 6, 19, .3);
 }
 
 .option.is-selected .option__radio { border-color: var(--red); }
@@ -1085,21 +1210,190 @@ h1, h2, h3 { margin: 0; }
 .sheet__total-value.is-bumped { transform: scale(1.15); }
 
 .sheet__submit {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   border: 0;
   border-radius: 12px;
-  background: var(--red);
+  background: linear-gradient(158deg, #FF3444 0%, var(--red) 48%, #B00510 100%);
   color: #fff;
   font-weight: 700;
   font-size: 17px;
   padding: 15px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .38),
+    inset 0 -2px 4px rgba(0, 0, 0, .3),
+    0 6px 20px rgba(227, 6, 19, .35);
+  transition: transform .12s ease, filter .12s ease;
 }
+
+.sheet__submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(152deg,
+    rgba(255, 255, 255, .4) 0%,
+    rgba(255, 255, 255, .1) 30%,
+    rgba(255, 255, 255, 0) 52%);
+  pointer-events: none;
+}
+
+.sheet__submit:active { transform: scale(.985); filter: brightness(.95); }
 
 .sheet__hint {
   margin: 8px 0 0;
   font-size: 11.5px;
   color: var(--text-mute);
   text-align: center;
+}
+
+/* =========================================================
+   MODALE DE CONFIRMATION DU GUESS
+   ========================================================= */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(4, 6, 14, .68);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--pad);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
+
+.modal.is-open { opacity: 1; pointer-events: auto; }
+
+.modal__box {
+  width: 100%;
+  max-width: 380px;
+  border-radius: 20px;
+  padding: 22px 18px 16px;
+  text-align: center;
+  background:
+    linear-gradient(158deg, rgba(255, 255, 255, .1) 0%, rgba(255, 255, 255, .02) 40%),
+    var(--bg-elev);
+  backdrop-filter: blur(22px) saturate(1.7);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .28),
+    0 24px 60px rgba(0, 0, 0, .6);
+  transform: translateY(14px) scale(.97);
+  transition: transform .25s cubic-bezier(.2, .8, .3, 1);
+}
+
+.modal.is-open .modal__box { transform: translateY(0) scale(1); }
+
+.modal__titre {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 25px;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.modal__texte {
+  margin: 7px 0 16px;
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+.modal__texte b { color: #fff; }
+
+.modal__gain {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16);
+  border-radius: 12px;
+  padding: 11px 14px;
+  margin-bottom: 14px;
+}
+
+.modal__gain-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.modal__gain-value {
+  font-family: 'Betclic Condensed', sans-serif;
+  font-size: 28px;
+  font-style: italic;
+  color: var(--yellow);
+  line-height: 1;
+}
+
+.modal__primary {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(158deg, #FF3444 0%, var(--red) 48%, #B00510 100%);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16.5px;
+  padding: 14px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .38),
+    inset 0 -2px 4px rgba(0, 0, 0, .3),
+    0 6px 20px rgba(227, 6, 19, .35);
+  transition: transform .12s ease, filter .12s ease;
+}
+
+.modal__primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(152deg,
+    rgba(255, 255, 255, .4) 0%,
+    rgba(255, 255, 255, .1) 30%,
+    rgba(255, 255, 255, 0) 52%);
+  pointer-events: none;
+}
+
+.modal__primary:active { transform: scale(.985); filter: brightness(.95); }
+
+.modal__secondary {
+  width: 100%;
+  margin-top: 9px;
+  border-radius: 12px;
+  padding: 13px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  background: rgba(255, 255, 255, .06);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22);
+  transition: background .15s ease;
+}
+
+.modal__secondary:active { background: rgba(255, 255, 255, .11); }
+
+.modal__cancel {
+  width: 100%;
+  background: none;
+  border: 0;
+  color: var(--text-mute);
+  font-size: 13px;
+  padding: 12px 0 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* =========================================================

@@ -7,22 +7,52 @@ ouvrant la rumeur et en ajoutant des sélections complémentaires.
 
 ## La mécanique
 
-1. **Un guess par jour.** Le fil présente les rumeurs du jour. Le bouton jaune
-   `5 €` valide directement le guess : « ce transfert est officialisé
-   aujourd'hui ».
-2. **Booster la cagnotte.** Ouvrir une rumeur donne accès à des sélections
+1. **Un guess par jour.** Le fil présente les rumeurs du jour, classées par
+   fiabilité décroissante. Le bouton jaune porte le gain du guess seul.
+2. **Confirmation.** Ce bouton ne valide pas d'emblée : une modale demande si le
+   joueur confirme en l'état ou s'il préfère enrichir son guess.
+3. **Booster la cagnotte.** La fiche de la rumeur donne accès aux sélections
    additionnelles — club d'arrivée, tranche horaire de l'officialisation,
    tranche de montant, forme du transfert. Chaque option affiche ce qu'elle
    rapporte en plus (`+7 €`, `+14 €`…) et le total se recalcule en direct.
-3. **Tout ou rien.** Les sélections ajoutées doivent toutes être justes pour que
+4. **Tout ou rien.** Les sélections ajoutées doivent toutes être justes pour que
    la cagnotte soit payée.
-4. **Verrouillage.** Une fois le guess validé, les autres rumeurs passent en
+5. **Verrouillage.** Une fois le guess validé, les autres rumeurs passent en
    grisé : un seul guess par jour. Le guess reste modifiable ou annulable
    jusqu'à minuit.
-5. **Série.** Les losanges sous le titre rappellent les résultats des derniers
+6. **Série.** Les losanges sous le titre rappellent les résultats des derniers
    jours, dans l'esprit des indicateurs de forme de l'app.
 
 Aucune cote n'est affichée nulle part : tout est exprimé en euros de freebets.
+Le joueur est tutoyé partout.
+
+## Cohérence des montants
+
+Le gain est l'inverse de la probabilité, à deux niveaux : le `gainBase` de la
+rumeur, et le `bonus` de chaque option de booster. Un dossier bouclé rapporte
+peu, un dossier enlisé rapporte gros ; dans un groupe de sélections, l'issue
+attendue vaut quelques euros et l'issue improbable plusieurs dizaines.
+
+Les fiabilités reflètent l'état réel des dossiers au 12 août 2026 :
+
+| Rumeur | Statut | Fiabilité | Guess seul |
+|---|---|---|---|
+| Ferran Torres → PSG | Accord imminent, joueur d'accord, ~50 M€ | 88 % | 5 € |
+| Rodri → Barça | Accord bouclé à 50 M€, arrivée attendue le 12 | 85 % | 5 € |
+| Bouaddi → Man City | Contrat perso jusqu'en 2031, détails financiers en cours | 72 % | 8 € |
+| Barcola → Liverpool | Liverpool à 115 M€, le PSG en réclame 150 | 28 % | 20 € |
+| Álvarez → Barça | L'Atlético refuse de vendre, dossier enlisé | 12 % | 40 € |
+
+Sources : [Goal](https://www.goal.com/en/news/setting-his-arrival-date-barcelona-seal-rodri-deal/bltb4b47bccbfab0a80) et
+[Foot Mercato](https://www.footmercato.net/a5796867186227462159-fc-barcelone-immense-coup-de-froid-pour-le-transfert-de-rodri) (Rodri),
+[CulturePSG](https://www.culturepsg.com/news/mercato/le-transfert-de-ferran-torres-au-psg-regle-avant-le-12-aout/60241) et
+[Foot Mercato](https://www.footmercato.net/a760401614473913167-mercato-ferran-torres-a-donne-son-accord-pour-rejoindre-le-psg) (Ferran Torres),
+[Get French Football News](https://www.getfootballnewsfrance.com/2026/lille-and-manchester-city-poised-to-finalize-agreement-over-ayyoub-bouaddi-transfer/) et
+[Sky Sports](https://www.skysports.com/football/news/11679/13571912/ayyoub-bouaddi-transfer-why-do-man-city-want-to-spend-big-on-another-midfielder-after-signing-elliot-anderson) (Bouaddi),
+[CulturePSG](https://www.culturepsg.com/news/mercato/liverpool-avance-de-15-m-pour-barcola/60264) et
+[Eurosport](https://www.eurosport.fr/football/transferts/2026-2027/mercato-i-150-millions-pour-bradley-barcola-psg-convoite-par-liverpool-est-ce-vraiment-delirant_sto23325898/story.shtml) (Barcola),
+[Goal](https://www.goal.com/en/news/alvarez-deal-enters-a-dark-tunnel-between-barcelona-and-atletico-madrid/bltf23932a2e5b6c3a1) et
+[Foot Mercato](https://www.footmercato.net/a8628089489864311937-le-fc-barcelone-perd-tout-espoir-dans-le-dossier-julian-alvarez) (Álvarez).
 
 ## Lancer le site
 
@@ -56,6 +86,7 @@ Reprise de l'app Betclic à partir de la capture fournie :
 | Rouge Betclic | `#E30613` |
 | Boutons de gain | jaune `#FFE14A`, chiffre en Condensed Bold italique |
 | Jauges & validations | turquoise `#14D6A6` |
+| Liquid glass | `.glass` (verre translucide) et `.glass-sheen` (reflet sur surface pleine) |
 | Titres | Betclic Condensed Bold, en capitales |
 | Textes | Betclic Regular / Bold |
 

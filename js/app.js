@@ -29,6 +29,9 @@
   var sheetScroll = $('#sheet-scroll');
   var ticketEl = $('#ticket');
   var toastEl = $('#toast');
+  var modal = $('#modal');
+
+  var rumeurEnAttente = null; // rumeur soumise à confirmation
 
   /* =========================================================
      Utilitaires
@@ -284,7 +287,7 @@
 
     $('#streak-label').innerHTML = guess
       ? 'Guess enregistré <span class="dot">•</span> série en cours : <b>' + serie + ' jours</b>'
-      : 'Série en cours : <b>' + serie + ' jours</b> <span class="dot">•</span> ne la brisez pas';
+      : 'Série en cours : <b>' + serie + ' jours</b> <span class="dot">•</span> ne la brise pas';
   }
 
   /* =========================================================
@@ -337,13 +340,13 @@
         '<span class="base__check" aria-hidden="true">✓</span>' +
         '<span class="base__texte">' +
           '<span class="base__t">Le transfert est officialisé aujourd\'hui</span>' +
-          '<span class="base__s">Votre guess du jour, acquis par défaut</span>' +
+          '<span class="base__s">Ton guess du jour, acquis par défaut</span>' +
         '</span>' +
         '<span class="base__gain"><b>' + rumeur.gainBase + ' €</b></span>' +
       '</div>' +
 
       '<div class="boosters">' +
-        '<h3 class="boosters__intro">Boostez vos freebets</h3>' +
+        '<h3 class="boosters__intro">Booste tes freebets</h3>' +
         '<p class="boosters__sub">Chaque sélection ajoutée gonfle la cagnotte. Toutes doivent tomber juste pour être payées.</p>' +
         groupes +
       '</div>';
@@ -366,7 +369,7 @@
       ? 'Mettre à jour mon guess'
       : 'Valider mon guess';
     $('#sheet-hint').textContent = nb === 0
-      ? 'Sans sélection additionnelle, vous jouez le transfert seul.'
+      ? 'Sans sélection additionnelle, tu joues le transfert seul.'
       : nb + (nb > 1 ? ' sélections ajoutées' : ' sélection ajoutée') + ' — toutes doivent être justes.';
   }
 
@@ -376,7 +379,7 @@
 
     // Un seul guess par jour : les autres rumeurs sont consultables mais figées.
     if (guess && guess.rumeurId !== rumeurId) {
-      toast('Un seul guess par jour — revenez demain !');
+      toast('Un seul guess par jour — reviens demain !');
       return;
     }
 
@@ -399,6 +402,38 @@
     sheet.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('sheet-open');
     brouillon = null;
+  }
+
+  /* =========================================================
+     Modale de confirmation
+     ---------------------------------------------------------
+     Le bouton jaune ne valide plus directement : on demande
+     d'abord si le joueur confirme ou s'il préfère enrichir son
+     guess de sélections additionnelles.
+     ========================================================= */
+  function ouvrirModal(rumeurId) {
+    var rumeur = trouverRumeur(rumeurId);
+    if (!rumeur) return;
+
+    rumeurEnAttente = rumeur;
+
+    $('#modal-texte').innerHTML =
+      'Tu paries que le transfert de <b>' + echapper(rumeur.joueur) + '</b> vers ' +
+      echapper(rumeur.clubCible.nom) + ' sera officialisé aujourd\'hui.';
+    $('#modal-gain').textContent = rumeur.gainBase + ' €';
+
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('sheet-open');
+  }
+
+  function fermerModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    if (!sheet.classList.contains('is-open')) {
+      document.body.classList.remove('sheet-open');
+    }
+    rumeurEnAttente = null;
   }
 
   /* =========================================================
@@ -431,7 +466,7 @@
     sauver();
     rendreTout();
     majCompteur();
-    toast('Guess annulé — vous pouvez rejouer aujourd\'hui');
+    toast('Guess annulé — tu peux rejouer aujourd\'hui');
   }
 
   function rendreTout() {
@@ -476,9 +511,27 @@
      Écouteurs
      ========================================================= */
   document.addEventListener('click', function (e) {
-    // Valider directement depuis le bouton jaune de la carte
+    // Le bouton jaune ouvre la confirmation, il ne valide pas d'emblée
     var direct = e.target.closest('[data-valider]');
-    if (direct) { validerGuess(direct.dataset.valider, {}); return; }
+    if (direct) { ouvrirModal(direct.dataset.valider); return; }
+
+    // Modale : valider tel quel
+    if (e.target.closest('#modal-valider') && rumeurEnAttente) {
+      var id = rumeurEnAttente.id;
+      fermerModal();
+      validerGuess(id, {});
+      return;
+    }
+
+    // Modale : basculer vers les sélections additionnelles
+    if (e.target.closest('#modal-booster') && rumeurEnAttente) {
+      var idBoost = rumeurEnAttente.id;
+      fermerModal();
+      ouvrirSheet(idBoost);
+      return;
+    }
+
+    if (e.target.closest('[data-close-modal]') || e.target === modal) { fermerModal(); return; }
 
     // Ouvrir la fiche
     var ouvrir = e.target.closest('[data-ouvrir]');
@@ -514,7 +567,9 @@
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') fermerSheet();
+    if (e.key !== 'Escape') return;
+    if (modal.classList.contains('is-open')) fermerModal();
+    else fermerSheet();
   });
 
   /* =========================================================
